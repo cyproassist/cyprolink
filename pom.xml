@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.cyproassist</groupId>
+	<artifactId>cyproassist-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<properties>
+		<tycho-version>0.24.0</tycho-version>
+		<scala.version>2.11.1</scala.version>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<scalaVersion>${scala.version}</scalaVersion>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<excludeResources>
+						<excludeResource>**/*.scala</excludeResource>
+					</excludeResources>
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-packaging-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+
+				<!-- Plugins for copying of Webjars and Java dependencies into the projects. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.10</version>
+					<executions>
+						<execution>
+							<id>embed-webjars</id>
+							<phase>none</phase>
+							<goals>
+								<goal>unpack-dependencies</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>.</outputDirectory>
+								<includeScope>runtime</includeScope>
+								<includes>META-INF/resources/webjars/**</includes>
+								<excludes>**/src/**</excludes>
+								<overWriteIfNewer>true</overWriteIfNewer>
+							</configuration>
+						</execution>
+						<execution>
+							<id>copy-libraries</id>
+							<phase>none</phase>
+							<goals>
+								<goal>copy-dependencies</goal>
+							</goals>
+							<configuration>
+								<excludeGroupIds>org.webjars, org.webjars.bower, org.webjars.npm</excludeGroupIds>
+								<stripVersion>true</stripVersion>
+								<outputDirectory>lib/</outputDirectory>
+								<includeScope>runtime</includeScope>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+				<!-- Configuration for Eclipse M2E -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+										<versionRange>[0.0,)</versionRange>
+										<goals>
+											<goal>unpack-dependencies</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>enilink</id>
+			<layout>p2</layout>
+			<url>https://dl.bintray.com/enilink/updates/enilink/1.2.3/</url>
+		</repository>
+	</repositories>
+
+	<modules>
+		<module>de.cyproassist.web</module>
+	</modules>
+</project>

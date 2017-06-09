@@ -1,0 +1,100 @@
+<div data-lift="surround?with=default;at=content"
+	prefix="
+	rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+	foaf: http://xmlns.com/foaf/0.1/ 
+	owl: http://www.w3.org/2002/07/owl#
+	rdfs: http://www.w3.org/2000/01/rdf-schema#
+	dcterms: http://purl.org/dc/terms/
+	lf-maint: http://linkedfactory.org/vocab/maintenance#
+	">
+
+	<link rel="stylesheet" type="text/css" href="../css/app.css"
+		data-lift="head"></link>
+
+	<script data-lift="head">
+		require.config({
+			urlArgs : "bust=" + (new Date()).getTime(),
+			paths : {
+				instructions : "/cyprolink/js/instructions"
+			}
+		});
+
+		$(function() {
+			require([ "instructions" ], function(instructions) {
+				instructions.attachTo(".instructions", {
+					orderRel : "lf-maint:nextInstruction"
+				});
+			});
+		});
+	</script>
+
+	<script data-lift="head">
+		$(function() {
+			var $language = $('.language');
+
+			var params = enilink.params();
+			if (params.lang) {
+				$language.val(params.lang);
+			}
+
+			var lang = $language.val();
+			$('[lang]').each(function() {
+				var $this = $(this);
+				if ($this.attr('lang') != lang) {
+					$this.hide();
+				} else {
+					$this.show();
+				}
+			});
+
+			$('[data-add="text"]').attr('data-lang', lang);
+			$language.change(function() {
+				params.lang = $(this).val();
+				window.location.search = enilink.encodeParams(params);
+			});
+		});
+	</script>
+
+	<script data-lift="JS.templates"></script>
+	<script data-lift="JS.rdfa"></script>
+
+	<div about="?this" data-lift="rdfa">
+		<div>
+			<h3 style="display: inline-block" class="editable"
+				property="lf-maint:text" content="?text" data-lift="rdf.label"></h3>
+
+			<div style="text-align: right; display: flex" class="pull-right">
+				<select class="form-control language">
+					<option value="de">Deutsch</option>
+					<option value="en">Englisch</option>
+				</select>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+
+		<!-- textarea class="query"></textarea -->
+
+		<div data-pattern="?this lf-maint:nextInstruction+ ?ins">
+			<ul class="instructions">
+				<!-- invisible element is required to update pointer to the head element of the linked list -->
+				<li about="?this" style="display: none"><span
+					rel="lf-maint:nextInstruction" resource="?" class="optional"
+					style="display: none"></span></li>
+
+				<li about="?ins"><span rel="lf-maint:nextInstruction"
+					resource="?" class="optional" style="display: none"></span> <a
+					class="btn-hover" href="{app}/describe?model={model}&resource={}"
+					data-lift="rdf.ref?to=href"><span about="?ins"
+						data-lift="rdf.label"></span></a>
+
+					<div style="float: right">
+						<a href="javascript://"><i
+							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
+							class="glyphicon glyphicon-arrow-down"></i></a>
+					</div></li>
+			</ul>
+		</div>
+
+		<div data-lift="embed?what=editsupport"></div>
+	</div>
+</div>

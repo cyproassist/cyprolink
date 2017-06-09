@@ -1,0 +1,44 @@
+<div class="modal fade" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form data-lift="form">
+				<div data-lift="cyprolink/events.create"></div>
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h3>Neues Ereignis</h3>
+				</div>
+				<div class="modal-body" data-lift="rdfa">
+					<fieldset>
+						<div class="form-group">
+							<label>Name</label>
+							<div>
+								<input type="text" name="name"
+									placeholder="Name des Ereignisses..." class="form-control"></input>
+								<div>
+									<span data-lift="bs.alert?id=alert-name"></span>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label>Beschreibung</label>
+							<div>
+								<textarea type="text" name="description"
+									placeholder="Beschreibung des Ereignisses..."
+									class="form-control"></textarea>
+								<div>
+									<span data-lift="bs.alert?id=alert-description"></span>
+								</div>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="btn btn-default" data-dismiss="modal"
+						aria-hidden="true">Abbrechen</a>
+					<button type="submit" class="btn btn-primary">Anlegen</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

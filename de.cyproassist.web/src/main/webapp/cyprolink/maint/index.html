@@ -1,0 +1,177 @@
+<div data-lift="surround?with=default;at=content"
+	prefix="
+	rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+	foaf: http://xmlns.com/foaf/0.1/ 
+	owl: http://www.w3.org/2002/07/owl#
+	rdfs: http://www.w3.org/2000/01/rdf-schema#
+	dcterms: http://purl.org/dc/terms/
+	lf-maint: http://linkedfactory.org/vocab/maintenance#
+	">
+
+	<link rel="stylesheet" type="text/css" href="../css/app.css"
+		data-lift="head"></link>
+
+	<style type="text/css" data-lift="head">
+#items>section:nth-child(2n+1) {
+	background-color: #F9F9F9;
+}
+
+#items {
+	margin-bottom: 1em;
+}
+
+.content {
+	padding: 5px;
+}
+
+.search-form {
+	margin: 0;
+	margin-right: 25px;
+}
+</style>
+	<script data-lift="head">
+		$(function() {
+			$("#btn-add-item").click(function(e) {
+				enilink.render("cyprolink/maint/new-event", {
+					model : enilink.contextModel(this)
+				}, function(html) {
+					var div = $("#modal");
+					div.html(html);
+					div.find(".modal").modal("show");
+				});
+			});
+			$(document).on("event-created", function(evt, uri) {
+				var items = $("#items");
+				enilink.render({
+					template : "item",
+					bind : {
+						item : uri
+					}
+				}, {
+					model : enilink.contextModel(items),
+				}, function(html) {
+					items.append(html);
+				});
+				$("#modal .modal").modal("hide");
+			});
+
+			var $language = $('.language');
+
+			var params = enilink.params();
+			if (params.lang) {
+				$language.val(params.lang);
+			}
+
+			var lang = $language.val();
+			$('[lang]').each(function() {
+				var $this = $(this);
+				if ($this.attr('lang') != lang) {
+					$this.hide();
+				} else {
+					$this.show();
+				}
+			});
+
+			$('[data-add="text"]').attr('data-lang', lang);
+			$language.change(function() {
+				params.lang = $(this).val();
+				window.location.search = enilink.encodeParams(params);
+			});
+		});
+	</script>
+
+	<script data-lift="JS.templates"></script>
+	<script data-lift="JS.rdfa"></script>
+
+	<div data-lift="cyprolink/rdfaUtils.orderby">
+		<div data-lift="rdfa">
+			<h3 style="display: inline-block">Events</h3>
+
+			<div style="text-align: right; display: flex" class="pull-right">
+				<div class="search-form"></div>
+
+				<div>
+					<select class="form-control language">
+						<option value="de">Deutsch</option>
+						<option value="en">Englisch</option>
+					</select>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+
+			<section class="row header-top">
+				<div class="col-md-2">
+					<h4 data-orderby="item">Name</h4>
+				</div>
+				<div class="col-md-2">
+					<h4 data-orderby="nr!asc">Nummer</h4>
+				</div>
+				<div class="col-md-6">
+					<h4>Text</h4>
+				</div>
+				<div class="col-md-2">
+					<h4>Actions</h4>
+				</div>
+			</section>
+
+			<div id="items">
+				<section data-t="item" about="?item">
+					<div rel="rdf:type" resource="lf-maint:MaintenanceInstruction"></div>
+
+					<div class="row">
+						<div class="col-md-2">
+							<div class="content">
+								<h4 class="header-fluid" data-orderby="item">Name</h4>
+								<a href="{app}/maint/fault?resource={}"
+									data-lift="rdf.ref?to=href"><span data-lift="rdf.name"></span></a>
+							</div>
+						</div>
+						<div class="col-md-2 optional">
+							<div class="content">
+								<h4 class="header-fluid" data-orderby="nr">Nummer</h4>
+								<div property="lf-maint:id" content="?nr" data-lift="rdf.label"></div>
+							</div>
+						</div>
+						<div class="col-md-6 optional">
+							<div class="content">
+								<h4 class="header-fluid">Text</h4>
+								<div property="lf-maint:text" content="?text" class="editable"
+									data-t="text">
+									<span data-lift="rdf.label"></span>
+								</div>
+								<!-- a simple add button -->
+								<div data-property="lf-maint:text" data-add="text">
+									<i class="glyphicon glyphicon-plus"></i>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="content">
+								<h4 class="header-fluid">Actions</h4>
+								<a class="btn-delete-item btn-hover" href="javascript://"
+									data-lift2="beginner/experiments.delete"><i
+									class="glyphicon glyphicon-trash"></i></a> <a class="btn-hover"
+									href="{app}/describe?model={model}&resource={}"
+									data-lift="rdf.ref?to=href"><i
+									class="glyphicon glyphicon-edit"></i></a>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+
+			<section>
+				<a id="btn-add-item" class="btn btn-default btn-small"
+					href="javascript:void(0)"><i class="glyphicon glyphicon-plus"></i>
+					Create</a>
+			</section>
+			<div id="modal"></div>
+			<div data-for="?item" data-items="15" class="paginator"></div>
+			<div data-lift="embed?what=editsupport"></div>
+
+			<!-- textarea class="col-md-12 query"></textarea -->
+
+			<div class="search-patterns" data-for="?item ?text" data-param="q"></div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="net.enilink.komma.model.uriMapRules">
+      <rule
+            pattern="http://example.org/models/beginner/"
+            priority="5"
+            replacement="platform:/plugin/de.cyproassist.web/META-INF/ontologies/app.ttl">
+      </rule>
+   </extension>
+
+</plugin>
