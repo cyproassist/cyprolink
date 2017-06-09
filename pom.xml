@@ -51,6 +51,21 @@
 			<plugins>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<target>
+							<artifact>
+								<groupId>de.cyproassist</groupId>
+								<artifactId>target-platform</artifactId>
+								<version>1.0.0</version>
+							</artifact>
+						</target>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-packaging-plugin</artifactId>
 					<version>${tycho-version}</version>
 				</plugin>
@@ -120,15 +135,8 @@
 		</pluginManagement>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>enilink</id>
-			<layout>p2</layout>
-			<url>https://dl.bintray.com/enilink/updates/enilink/1.2.3/</url>
-		</repository>
-	</repositories>
-
 	<modules>
+		<module>target-platform</module>
 		<module>de.cyproassist.web</module>
 	</modules>
 </project>
