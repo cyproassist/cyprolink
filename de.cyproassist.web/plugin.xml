@@ -4,9 +4,9 @@
    <extension
          point="net.enilink.komma.model.uriMapRules">
       <rule
-            pattern="http://example.org/models/beginner/"
+            pattern="http://linkedfactory.org/vocab/maintenance"
             priority="5"
-            replacement="platform:/plugin/de.cyproassist.web/META-INF/ontologies/app.ttl">
+            replacement="platform:/plugin/de.cyproassist.web/META-INF/ontologies/lf-maint.ttl">
       </rule>
    </extension>
 

@@ -28,6 +28,10 @@
 	margin: 0;
 	margin-right: 25px;
 }
+
+.label {
+	color: white;
+}
 </style>
 	<script data-lift="head">
 		$(function() {
@@ -55,6 +59,7 @@
 				$("#modal .modal").modal("hide");
 			});
 
+			// initialize language input from query parameters
 			var $language = $('.language');
 
 			var params = enilink.params();
@@ -62,6 +67,7 @@
 				$language.val(params.lang);
 			}
 
+			// hide non-relevant texts according to current language
 			var lang = $language.val();
 			$('[lang]').each(function() {
 				var $this = $(this);
@@ -71,12 +77,31 @@
 					$this.show();
 				}
 			});
-
+			// set correct language for new elements
 			$('[data-add="text"]').attr('data-lang', lang);
+
 			$language.change(function() {
 				params.lang = $(this).val();
 				window.location.search = enilink.encodeParams(params);
 			});
+
+			// Add label classes for each event type			
+			$('.item').each(
+					function() {
+						var types = $(this).find('[rel="rdf:type"] [resource]')
+								.map(function() {
+									return $(this).attr('resource');
+								}).get().join(' ').toLowerCase();
+
+						var labelType = 'info';
+						if (types.includes('fault')) {
+							labelType = 'danger';
+						} else if (types.includes('warning')) {
+							labelType = 'warning';
+						}
+
+						$(this).find('.label').addClass('label-' + labelType);
+					});
 		});
 	</script>
 
@@ -115,21 +140,32 @@
 			</section>
 
 			<div id="items">
-				<section data-t="item" about="?item">
-					<div rel="rdf:type" resource="lf-maint:MaintenanceInstruction"></div>
+				<section data-t="item" about="?item" class="item">
+					<div rel="rdf:type">
+						<span class="union clearable"> <span
+							resource="lf-maint:Event"></span> <span resource="lf-maint:Fault"></span>
+							<span resource="lf-maint:Warning"></span> <span
+							resource="lf-maint:Information"></span>
+						</span>
+						<div resource="?type"></div>
+					</div>
 
 					<div class="row">
 						<div class="col-md-2">
 							<div class="content">
 								<h4 class="header-fluid" data-orderby="item">Name</h4>
-								<a href="{app}/maint/fault?resource={}"
-									data-lift="rdf.ref?to=href"><span data-lift="rdf.name"></span></a>
+
+								<div>
+									<a href="{app}/maint/event?resource={}"
+										data-lift="rdf.ref?to=href"><span class="label"> <span
+											data-lift="rdf.name"></span></span></a>
+								</div>
 							</div>
 						</div>
 						<div class="col-md-2 optional">
 							<div class="content">
 								<h4 class="header-fluid" data-orderby="nr">Nummer</h4>
-								<div property="lf-maint:id" content="?nr" data-lift="rdf.label"></div>
+								<div property="lf-maint:nr" content="?nr" data-lift="rdf.label"></div>
 							</div>
 						</div>
 						<div class="col-md-6 optional">

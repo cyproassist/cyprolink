@@ -22,7 +22,7 @@
 		$(function() {
 			require([ "instructions" ], function(instructions) {
 				instructions.attachTo(".instructions", {
-					orderRel : "lf-maint:nextInstruction"
+					orderRel : "lf-maint:nextActivity"
 				});
 			});
 		});
@@ -74,14 +74,14 @@
 
 		<!-- textarea class="query"></textarea -->
 
-		<div data-pattern="?this lf-maint:nextInstruction+ ?ins">
+		<div data-pattern="?this lf-maint:nextActivity+ ?ins">
 			<ul class="instructions">
 				<!-- invisible element is required to update pointer to the head element of the linked list -->
 				<li about="?this" style="display: none"><span
-					rel="lf-maint:nextInstruction" resource="?" class="optional"
+					rel="lf-maint:nextActivity" resource="?" class="optional"
 					style="display: none"></span></li>
 
-				<li about="?ins"><span rel="lf-maint:nextInstruction"
+				<li about="?ins"><span rel="lf-maint:nextActivity"
 					resource="?" class="optional" style="display: none"></span> <a
 					class="btn-hover" href="{app}/describe?model={model}&resource={}"
 					data-lift="rdf.ref?to=href"><span about="?ins"

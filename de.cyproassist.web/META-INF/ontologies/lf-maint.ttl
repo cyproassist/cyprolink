@@ -1,0 +1,305 @@
+# baseURI: http://linkedfactory.org/vocab/maintenance
+# prefix: lf-maint
+
+@prefix : <http://linkedfactory.org/vocab/maintenance#> .
+@prefix lf-maint: <http://linkedfactory.org/vocab/maintenance#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://linkedfactory.org/vocab/maintenance>
+  rdf:type owl:Ontology ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+lf-maint:Activity
+  rdf:type owl:Class ;
+  rdfs:label "Aktivität"@de ;
+  rdfs:label "activity"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Class ;
+      owl:intersectionOf (
+          [
+            rdf:type owl:Restriction ;
+            owl:allValuesFrom lf-maint:Activity ;
+            owl:onProperty lf-maint:nextActivity ;
+          ]
+          [
+            rdf:type owl:Restriction ;
+            owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty lf-maint:nextActivity ;
+          ]
+        ) ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:anyURI ;
+      owl:onProperty lf-maint:uri ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:boolean ;
+      owl:onProperty lf-maint:done ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:boolean ;
+      owl:onProperty lf-maint:isBold ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:boolean ;
+      owl:onProperty lf-maint:isItalic ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:boolean ;
+      owl:onProperty lf-maint:isLocalized ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:text ;
+    ] ;
+.
+lf-maint:Correction
+  rdf:type owl:Class ;
+  rdfs:label "Fehlerbehebung"@de ;
+  rdfs:label "correction"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Class ;
+      owl:intersectionOf (
+          [
+            rdf:type owl:Restriction ;
+            owl:allValuesFrom lf-maint:Activity ;
+            owl:onProperty lf-maint:nextActivity ;
+          ]
+          [
+            rdf:type owl:Restriction ;
+            owl:cardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty lf-maint:nextActivity ;
+          ]
+        ) ;
+    ] ;
+.
+lf-maint:Employee
+  rdf:type owl:Class ;
+  rdfs:label "Mitarbeiter"@de ;
+  rdfs:label "employee"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:name ;
+    ] ;
+.
+lf-maint:Event
+  rdf:type owl:Class ;
+  rdfs:label "Fehler"@de ;
+  rdfs:label "error"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom lf-maint:Activity ;
+      owl:onProperty lf-maint:nextActivity ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom lf-maint:Employee ;
+      owl:onProperty lf-maint:correctedBy ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom lf-maint:HazardNote ;
+      owl:onProperty lf-maint:note ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom lf-maint:Location ;
+      owl:onProperty lf-maint:occursInLocation ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom lf-maint:Machine ;
+      owl:onProperty lf-maint:occursInMachine ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:integer ;
+      owl:onProperty lf-maint:nr ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:description ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:designator ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:group ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:name ;
+    ] ;
+.
+lf-maint:Fault
+  rdf:type owl:Class ;
+  rdfs:label "Störung"@de ;
+  rdfs:label "fault"@en ;
+  rdfs:subClassOf lf-maint:Event ;
+.
+lf-maint:HazardNote
+  rdf:type owl:Class ;
+  rdfs:label "Gefahrenhinweis"@de ;
+  rdfs:label "hazard warning"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:anyURI ;
+      owl:onProperty lf-maint:uri ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:text ;
+    ] ;
+.
+lf-maint:Information
+  rdf:type owl:Class ;
+  rdfs:label "Information"@de ;
+  rdfs:label "information"@en ;
+  rdfs:subClassOf lf-maint:Event ;
+.
+lf-maint:Location
+  rdf:type owl:Class ;
+  rdfs:label "Einbauort"@de ;
+  rdfs:label "installation location"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:name ;
+    ] ;
+.
+lf-maint:Machine
+  rdf:type owl:Class ;
+  rdfs:label "Maschine"@de ;
+  rdfs:label "machine"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom xsd:string ;
+      owl:onProperty lf-maint:name ;
+    ] ;
+.
+lf-maint:Warning
+  rdf:type owl:Class ;
+  rdfs:label "Warnung"@de ;
+  rdfs:label "warning"@en ;
+  rdfs:subClassOf lf-maint:Event ;
+.
+lf-maint:correctedBy
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain lf-maint:Event ;
+  rdfs:label "Behebung durch"@de ;
+  rdfs:label "correction by"@en ;
+  rdfs:range lf-maint:Employee ;
+.
+lf-maint:description
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "Beschreibung"@de ;
+  rdfs:label "description"@en ;
+  rdfs:range xsd:string ;
+.
+lf-maint:designator
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "Betriebsmittelkennzeichen"@de ;
+  rdfs:label "designator"@en ;
+.
+lf-maint:done
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "Done" ;
+.
+lf-maint:group
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "Gruppe"@de ;
+  rdfs:label "group"@en ;
+.
+lf-maint:isBold
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "is bold"@en ;
+  rdfs:label "ist fett"@de ;
+  rdfs:range xsd:boolean ;
+.
+lf-maint:isItalic
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "is italic"@en ;
+  rdfs:label "ist kursiv"@de ;
+  rdfs:range xsd:boolean ;
+.
+lf-maint:isLocalized
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "is localized"@en ;
+  rdfs:label "ist lokalisiert"@de ;
+  rdfs:range xsd:boolean ;
+.
+lf-maint:name
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "Name"@de ;
+  rdfs:label "name"@en ;
+.
+lf-maint:nextActivity
+  rdf:type owl:ObjectProperty ;
+  rdfs:label "Next" ;
+.
+lf-maint:note
+  rdf:type owl:ObjectProperty ;
+  rdfs:label "Hinweis"@de ;
+  rdfs:label "note"@en ;
+.
+lf-maint:nr
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "Nummer"@de ;
+  rdfs:label "number"@en ;
+  rdfs:range xsd:integer ;
+.
+lf-maint:occursIn
+  rdf:type owl:ObjectProperty ;
+  rdfs:label "occurs in"@en ;
+  rdfs:label "tritt auf in"@de ;
+.
+lf-maint:occursInLocation
+  rdf:type owl:ObjectProperty ;
+  rdfs:label "occurs in location"@en ;
+  rdfs:label "tritt auf in Ort"@de ;
+  rdfs:range lf-maint:Location ;
+  rdfs:subPropertyOf lf-maint:occursIn ;
+.
+lf-maint:occursInMachine
+  rdf:type owl:ObjectProperty ;
+  rdfs:label "occurs in machine"@en ;
+  rdfs:label "tritt auf in Maschine"@de ;
+  rdfs:range lf-maint:Machine ;
+  rdfs:subPropertyOf lf-maint:occursIn ;
+.
+lf-maint:text
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain lf-maint:Event ;
+  rdfs:label "Text"@de ;
+  rdfs:label "text"@en ;
+  rdfs:range xsd:string ;
+.
+lf-maint:uri
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "has URI"@en ;
+  rdfs:label "hat URI"@de ;
+.

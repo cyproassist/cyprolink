@@ -38,3 +38,10 @@
 .btn-hover:hover {
 	opacity: 1.0;
 }
+
+form .alert {
+	font-size: small;
+	padding: 4px;
+	display: inline-block;
+	margin: 3px 0 0 0;
+}

@@ -24,7 +24,7 @@ class LiftModule {
   def sitemapMutator: SiteMap => SiteMap = {
     val menu = application(app, app :: Nil, List(
       appMenu("maint.instructions", S ? "Maintenance", List("maint", "index")) submenus List(
-        appMenu("maint.fault", S ? "Fault", List("maint", "fault")) >> HideIfInactive)))
+        appMenu("maint.event", S ? "Event", List("maint", "event")) >> HideIfInactive)))
 
     Menus.sitemapMutator(menu :: Nil)
   }
@@ -40,6 +40,7 @@ class LiftModule {
           var model = ms.getModel(DEFAULT_MODEL_URI, false)
           if (model == null) {
             model = ms.createModel(DEFAULT_MODEL_URI)
+            model.addImport(URIs.createURI("http://linkedfactory.org/vocab/maintenance"), "lf-maint")
           }
         } finally {
           ms.getUnitOfWork.end
