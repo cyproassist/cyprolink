@@ -54,7 +54,9 @@
 				}, {
 					model : enilink.contextModel(items),
 				}, function(html) {
-					items.append(html);
+					var newItem = $(html);
+					newItem.appendTo(items);
+					newItem.each(highlightType);
 				});
 				$("#modal .modal").modal("hide");
 			});
@@ -85,23 +87,24 @@
 				window.location.search = enilink.encodeParams(params);
 			});
 
+			function highlightType() {
+				var types = $(this).find('[rel="rdf:type"] [resource]').map(
+						function() {
+							return $(this).attr('resource');
+						}).get().join(' ').toLowerCase();
+
+				var labelType = 'info';
+				if (types.includes('fault')) {
+					labelType = 'danger';
+				} else if (types.includes('warning')) {
+					labelType = 'warning';
+				}
+
+				$(this).find('.label').addClass('label-' + labelType);
+			}
+
 			// Add label classes for each event type			
-			$('.item').each(
-					function() {
-						var types = $(this).find('[rel="rdf:type"] [resource]')
-								.map(function() {
-									return $(this).attr('resource');
-								}).get().join(' ').toLowerCase();
-
-						var labelType = 'info';
-						if (types.includes('fault')) {
-							labelType = 'danger';
-						} else if (types.includes('warning')) {
-							labelType = 'warning';
-						}
-
-						$(this).find('.label').addClass('label-' + labelType);
-					});
+			$('.item').each(highlightType);
 		});
 	</script>
 
@@ -110,6 +113,8 @@
 
 	<div data-lift="cyprolink/rdfaUtils.orderby">
 		<div data-lift="rdfa">
+			<!-- textarea class="col-md-12 query"></textarea -->
+
 			<h3 style="display: inline-block">Events</h3>
 
 			<div style="text-align: right; display: flex" class="pull-right">
@@ -185,7 +190,7 @@
 							<div class="content">
 								<h4 class="header-fluid">Actions</h4>
 								<a class="btn-delete-item btn-hover" href="javascript://"
-									data-lift2="beginner/experiments.delete"><i
+									data-lift="cyprolink/events.delete"><i
 									class="glyphicon glyphicon-trash"></i></a> <a class="btn-hover"
 									href="{app}/describe?model={model}&resource={}"
 									data-lift="rdf.ref?to=href"><i
@@ -202,10 +207,8 @@
 					Create</a>
 			</section>
 			<div id="modal"></div>
-			<div data-for="?item" data-items="15" class="paginator"></div>
+			<div data-for="?item" data-items="10" class="paginator"></div>
 			<div data-lift="embed?what=editsupport"></div>
-
-			<!-- textarea class="col-md-12 query"></textarea -->
 
 			<div class="search-patterns" data-for="?item ?text" data-param="q"></div>
 		</div>

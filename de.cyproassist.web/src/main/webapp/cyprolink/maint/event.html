@@ -11,6 +11,21 @@
 	<link rel="stylesheet" type="text/css" href="../css/app.css"
 		data-lift="head"></link>
 
+	<style>
+.instructions {
+	list-style-type: none;
+}
+
+.instructions a {
+	opacity: 1.0;
+	width: 100%;
+}
+
+.instructions *[lang]:before {
+	content: "";
+}
+</style>
+
 	<script data-lift="head">
 		require.config({
 			urlArgs : "bust=" + (new Date()).getTime(),
@@ -24,6 +39,20 @@
 				instructions.attachTo(".instructions", {
 					orderRel : "lf-maint:nextActivity"
 				});
+			});
+
+			var addBtn = $('.add-element');
+			addBtn.find('i').click(function() {
+				addBtn.editable({
+					type : "text",
+					onblur : "ignore",
+					inputclass : "editable-form-control",
+					emptyclass : "",
+					emptytext : "",
+					mode : "inline",
+					toggle : "manual"
+				});
+				addBtn.editable("show");
 			});
 		});
 	</script>
@@ -81,18 +110,29 @@
 					rel="lf-maint:nextActivity" resource="?" class="optional"
 					style="display: none"></span></li>
 
-				<li about="?ins"><span rel="lf-maint:nextActivity"
-					resource="?" class="optional" style="display: none"></span> <a
-					class="btn-hover" href="{app}/describe?model={model}&resource={}"
-					data-lift="rdf.ref?to=href"><span about="?ins"
-						data-lift="rdf.label"></span></a>
+				<!-- a visible element -->
+				<li about="?ins">
+					<!-- meta data: pointer to the next activity --> <span
+					rel="lf-maint:nextActivity" resource="?" class="optional"
+					style="display: none"></span>
+					<div>
+						<a class="btn-hover"
+							href="{app}/describe?model={model}&resource={}"
+							data-lift="rdf.ref?to=href"><span about="?ins"
+							property="lf-maint:text" content="?" data-lift="rdf.label"></span></a>
 
-					<div style="float: right">
-						<a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-down"></i></a>
-					</div></li>
+						<div style="float: right">
+							<a href="javascript://"><i
+								class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
+								class="glyphicon glyphicon-arrow-down"></i></a>
+						</div>
+					</div>
+				</li>
 			</ul>
+
+			<div class="add-element">
+				<i data-t="51" class="glyphicon glyphicon-plus"></i>
+			</div>
 		</div>
 
 		<div data-lift="embed?what=editsupport"></div>

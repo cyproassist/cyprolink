@@ -21,15 +21,18 @@ class Events {
   def create = SHtml.hidden(() => {
     val result = for {
       model <- Globals.contextModel.vend
-      nr <- doAlert(paramNotEmpty("nr", "Bitte eine Nummer eingeben."))
+      nr <- doAlert(paramNotEmpty("nr", "Bitte eine Nummer eingeben.")).map(_.toInt)
       eventType <- doAlert(paramNotEmpty("type", "Bitte einen Typ eingeben.")).map(URIs.createURI(_))
     } yield {
       val em = model.getManager
-      val uri = model.getURI.appendLocalPart("event-" + nr)
-      if (em.hasMatch(uri, null, null)) {
-        doAlert(failure("name", "Ein Element mit diesem Typ und dieser Nummer existiert bereits."))
+      val query = em.createQuery("prefix lf-maint: <" + LF_MAINT.NS_URI + "> " +
+        "ask { ?s a ?type; lf-maint:nr ?nr }").setParameter("type", eventType).setParameter("nr", nr)
+      if (query.getBooleanResult) {
+        doAlert(failure("nr", "Ein Element mit diesem Typ und dieser Nummer existiert bereits."))
       } else {
+        val uri = model.getURI.appendLocalPart("event-" + eventType.localPart() + "-" + nr)
         val event = em.createNamed(uri, eventType).asInstanceOf[IResource]
+        event.addProperty(LF_MAINT.PROPERTY_NR, nr)
         S.param("description").filter(!_.isEmpty) foreach {
           desc => event.setRdfsComment(desc)
         }

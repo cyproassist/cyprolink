@@ -12,4 +12,6 @@ object LF_MAINT {
   val NS_URI = URIs.createURI("http://linkedfactory.org/vocab/maintenance#")
 
   val TYPE_EVENT = NS_URI.appendLocalPart("Event")
+  
+  val PROPERTY_NR = NS_URI.appendLocalPart("nr")
 }
