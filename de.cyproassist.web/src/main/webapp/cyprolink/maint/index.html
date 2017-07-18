@@ -24,6 +24,10 @@
 	padding: 5px;
 }
 
+.content.actions {
+	text-align: right;
+}
+
 .search-form {
 	margin: 0;
 	margin-right: 25px;
@@ -35,32 +39,6 @@
 </style>
 	<script data-lift="head">
 		$(function() {
-			$("#btn-add-item").click(function(e) {
-				enilink.render("cyprolink/maint/new-event", {
-					model : enilink.contextModel(this)
-				}, function(html) {
-					var div = $("#modal");
-					div.html(html);
-					div.find(".modal").modal("show");
-				});
-			});
-			$(document).on("event-created", function(evt, uri) {
-				var items = $("#items");
-				enilink.render({
-					template : "item",
-					bind : {
-						item : uri
-					}
-				}, {
-					model : enilink.contextModel(items),
-				}, function(html) {
-					var newItem = $(html);
-					newItem.appendTo(items);
-					newItem.each(highlightType);
-				});
-				$("#modal .modal").modal("hide");
-			});
-
 			// initialize language input from query parameters
 			var $language = $('.language');
 
@@ -71,23 +49,45 @@
 
 			// hide non-relevant texts according to current language
 			var lang = $language.val();
-			$('[lang]').each(function() {
-				var $this = $(this);
-				if ($this.attr('lang') != lang) {
-					$this.hide();
-				} else {
-					$this.show();
-				}
+
+			$("#btn-add-item").click(function(e) {
+				enilink.render("cyprolink/maint/new-event", {
+					model : enilink.contextModel(this)
+				}, function(html) {
+					var div = $("#modal");
+					div.html(html);
+					div.find(".modal").modal("show");
+				});
 			});
-			// set correct language for new elements
-			$('[data-add="text"]').attr('data-lang', lang);
+
+			$(document).on("event-created", function(evt, uri) {
+				var items = $("#items");
+				enilink.render({
+					template : "item",
+					bind : {
+						item : uri
+					}
+				}, {
+					model : enilink.contextModel(items)
+				}, function(html) {
+					var newItem = $(html);
+
+					newItem.each(prepareItem);
+					enilink.ui.enableAdd(newItem.find('[data-add]'));
+					items.append(newItem);
+				});
+				$("#modal .modal").modal("hide");
+			});
 
 			$language.change(function() {
 				params.lang = $(this).val();
 				window.location.search = enilink.encodeParams(params);
 			});
 
-			function highlightType() {
+			function prepareItem() {
+				// set correct language for new elements
+				$(this).find('[data-add="text"]').attr('data-lang', lang);
+				
 				var types = $(this).find('[rel="rdf:type"] [resource]').map(
 						function() {
 							return $(this).attr('resource');
@@ -104,7 +104,7 @@
 			}
 
 			// Add label classes for each event type			
-			$('.item').each(highlightType);
+			$('.item').each(prepareItem);
 		});
 	</script>
 
@@ -112,9 +112,9 @@
 	<script data-lift="JS.rdfa"></script>
 
 	<div data-lift="cyprolink/rdfaUtils.orderby">
-		<div data-lift="rdfa">
-			<!-- textarea class="col-md-12 query"></textarea -->
-
+		<!-- use lang as param to filter non-relevant texts -->
+		<div data-lift="rdfa" data-params="?lang"
+			data-bind="if(bound(?lang), ?lang, &quot;de&quot;) as ?currentLang">
 			<h3 style="display: inline-block">Events</h3>
 
 			<div style="text-align: right; display: flex" class="pull-right">
@@ -140,18 +140,19 @@
 					<h4>Text</h4>
 				</div>
 				<div class="col-md-2">
-					<h4>Actions</h4>
+					<h4></h4>
 				</div>
 			</section>
 
 			<div id="items">
 				<section data-t="item" about="?item" class="item">
 					<div rel="rdf:type">
-						<span class="union clearable"> <span
-							resource="lf-maint:Event"></span> <span resource="lf-maint:Fault"></span>
-							<span resource="lf-maint:Warning"></span> <span
-							resource="lf-maint:Information"></span>
-						</span>
+						<div class="union clearable">
+							<div resource="lf-maint:Event"></div>
+							<div resource="lf-maint:Fault"></div>
+							<div resource="lf-maint:Warning"></div>
+							<div resource="lf-maint:Information"></div>
+						</div>
 						<div resource="?type"></div>
 					</div>
 
@@ -174,12 +175,16 @@
 							</div>
 						</div>
 						<div class="col-md-6 optional">
-							<div class="content">
+							<div class="content" data-filter="lang(?text) = ?currentLang">
 								<h4 class="header-fluid">Text</h4>
+								<div property="lf-maint:text" content="?searchText"
+									class="clearable"></div>
+
 								<div property="lf-maint:text" content="?text" class="editable"
-									data-t="text">
+									data-t="text" style="display: inline-box">
 									<span data-lift="rdf.label"></span>
 								</div>
+
 								<!-- a simple add button -->
 								<div data-property="lf-maint:text" data-add="text">
 									<i class="glyphicon glyphicon-plus"></i>
@@ -187,8 +192,7 @@
 							</div>
 						</div>
 						<div class="col-md-2">
-							<div class="content">
-								<h4 class="header-fluid">Actions</h4>
+							<div class="content actions">
 								<a class="btn-delete-item btn-hover" href="javascript://"
 									data-lift="cyprolink/events.delete"><i
 									class="glyphicon glyphicon-trash"></i></a> <a class="btn-hover"
@@ -210,7 +214,10 @@
 			<div data-for="?item" data-items="10" class="paginator"></div>
 			<div data-lift="embed?what=editsupport"></div>
 
-			<div class="search-patterns" data-for="?item ?text" data-param="q"></div>
+			<!-- textarea class="col-md-12 query"></textarea -->
+
+			<div class="search-patterns" data-for="?item ?searchText"
+				data-param="q"></div>
 		</div>
 	</div>
 </div>

@@ -11,18 +11,37 @@
 	<link rel="stylesheet" type="text/css" href="../css/app.css"
 		data-lift="head"></link>
 
-	<style>
+	<style data-lift="head">
 .instructions {
-	list-style-type: none;
+	list-style: none;
+	padding: 0px;
 }
 
-.instructions a {
+.instructions li {
+	border: 1px solid grey;
+	margin: 4px;
+	padding: 5px;
+	position: relative;
+}
+
+.instructions li a {
 	opacity: 1.0;
-	width: 100%;
 }
 
-.instructions *[lang]:before {
+span[lang]::before {
 	content: "";
+}
+
+.instructions li .arrows {
+	visibility: hidden;
+}
+
+.instructions li:hover .arrows {
+	visibility: visible;
+}
+
+div.add-element {
+	margin: 4px;
 }
 </style>
 
@@ -110,22 +129,20 @@
 					rel="lf-maint:nextActivity" resource="?" class="optional"
 					style="display: none"></span></li>
 
-				<!-- a visible element -->
-				<li about="?ins">
-					<!-- meta data: pointer to the next activity --> <span
-					rel="lf-maint:nextActivity" resource="?" class="optional"
-					style="display: none"></span>
-					<div>
-						<a class="btn-hover"
-							href="{app}/describe?model={model}&resource={}"
-							data-lift="rdf.ref?to=href"><span about="?ins"
-							property="lf-maint:text" content="?" data-lift="rdf.label"></span></a>
+				<li about="?ins" data-t="instruction">
+					<div rel="lf-maint:nextActivity" resource="?" class="optional"
+						style="display: none"></div> <!-- the link --> <a
+					class="btn-hover" href="{app}/describe?model={model}&resource={}"
+					data-lift="rdf.ref?to=href"> <!-- the text label --> <span
+						about="?ins" property="lf-maint:text" content="?insText"
+						class="optional" data-lift="rdf.label"></span> <!-- fall back: the URI -->
+						<span data-unless="?insText" about="?ins" data-lift="rdf.label"></span>
+				</a>
 
-						<div style="float: right">
-							<a href="javascript://"><i
-								class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
-								class="glyphicon glyphicon-arrow-down"></i></a>
-						</div>
+					<div style="float: right" class="arrows">
+						<a href="javascript://"><i
+							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
+							class="glyphicon glyphicon-arrow-down"></i></a>
 					</div>
 				</li>
 			</ul>

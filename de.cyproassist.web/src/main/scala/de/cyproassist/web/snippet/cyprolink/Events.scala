@@ -13,6 +13,7 @@ import net.liftweb.http.SHtml
 import net.liftweb.http.js.JsCmds
 import net.liftweb.http.js.JsCmds.Run
 import net.liftweb.util.Helpers.strToCssBindPromoter
+import net.liftweb.util.Helpers.tryo
 import net.enilink.komma.core.URIs
 import de.cyproassist.web.util.DCTERMS
 import de.cyproassist.web.util.LF_MAINT
@@ -21,7 +22,7 @@ class Events {
   def create = SHtml.hidden(() => {
     val result = for {
       model <- Globals.contextModel.vend
-      nr <- doAlert(paramNotEmpty("nr", "Bitte eine Nummer eingeben.")).map(_.toInt)
+      nr <- doAlert(paramNotEmpty("nr", "Bitte eine Nummer eingeben.") flatMap (nr => tryo(nr.toInt)))
       eventType <- doAlert(paramNotEmpty("type", "Bitte einen Typ eingeben.")).map(URIs.createURI(_))
     } yield {
       val em = model.getManager
@@ -36,6 +37,7 @@ class Events {
         S.param("description").filter(!_.isEmpty) foreach {
           desc => event.setRdfsComment(desc)
         }
+        event.set(LF_MAINT.PROPERTY_NR, nr)
         event.set(DCTERMS.PROPERTY_DATE, DatatypeFactory.newInstance.newXMLGregorianCalendar(new GregorianCalendar))
         Full(Run(s"$$(document).trigger('event-created', ['$event']);"))
       }
