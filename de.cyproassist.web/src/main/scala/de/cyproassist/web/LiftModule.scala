@@ -1,19 +1,33 @@
 package de.cyproassist.web
 
-import scala.language.implicitConversions
-import net.enilink.lift.sitemap.Menus
-import net.enilink.lift.sitemap.Menus._
-import net.liftweb.http.S
-import net.liftweb.sitemap.LocPath.stringToLocPath
-import net.liftweb.sitemap.Menu
-import net.liftweb.sitemap.SiteMap
-import net.enilink.lift.util.Globals
-import net.liftweb.common.Full
-import net.enilink.komma.core.URIs
+import java.io.File
+import java.io.FileInputStream
 import java.util.HashMap
-import net.liftweb.http.Req
-import net.liftweb.http.LiftRules
+
+import scala.collection.JavaConversions.collectionAsScalaIterable
+import scala.language.implicitConversions
+
+import org.eclipse.osgi.service.datalocation.Location
+import org.osgi.framework.FrameworkUtil
+
+import net.enilink.komma.core.URIs
 import net.enilink.lift.sitemap.HideIfInactive
+import net.enilink.lift.sitemap.Menus
+import net.enilink.lift.sitemap.Menus.appMenu
+import net.enilink.lift.sitemap.Menus.application
+import net.enilink.lift.util.Globals
+import net.liftweb.common.Box
+import net.liftweb.common.Full
+import net.liftweb.http.GetRequest
+import net.liftweb.http.LiftRules
+import net.liftweb.http.LiftRulesMocker.toLiftRules
+import net.liftweb.http.Req
+import net.liftweb.http.S
+import net.liftweb.http.StreamingResponse
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.sitemap.SiteMap
+import net.liftweb.util.Helpers.tryo
+import java.net.URL
 
 /**
  * This is the main class of the web module. It sets up and tears down the application.
@@ -32,6 +46,10 @@ class LiftModule {
   val DEFAULT_MODEL_URI = URIs.createURI("http://cyproassist.de/models/maintenance")
 
   def boot {
+    // determine the instance location (workspace)
+    val ctx = FrameworkUtil.getBundle(getClass).getBundleContext
+    val locService = ctx.getServiceReferences(classOf[Location], Location.INSTANCE_FILTER).headOption.map(ctx.getService(_))
+    
     // create default default model on start up if it does not already exist
     Globals.contextModelSet.vend map {
       ms =>
@@ -40,6 +58,7 @@ class LiftModule {
           var model = ms.getModel(DEFAULT_MODEL_URI, false)
           if (model == null) {
             model = ms.createModel(DEFAULT_MODEL_URI)
+            model.load(URIs.createURI(locService.get.getURL + "etima.ttl"), new HashMap)
             model.addImport(URIs.createURI("http://linkedfactory.org/vocab/maintenance"), "lf-maint")
           }
         } finally {
@@ -50,6 +69,20 @@ class LiftModule {
     Globals.contextModelRules.prepend {
       case Req(`app` :: _, _, _) if !S.param("model").isDefined => Full(DEFAULT_MODEL_URI)
     }
+
+    object ImageDownload extends RestHelper {
+      serve {
+        case Req("cyprolink" :: "images" :: fileName :: Nil, ext, GetRequest) => for {
+          file <- {
+            val fileUrl = new URL(locService.get.getURL + "images/" + fileName + "." + ext.toLowerCase)
+            Box !! new File(fileUrl.toURI)
+          }
+          in <- tryo (new FileInputStream(file))
+        } yield StreamingResponse(in, () => in.close(), file.length, headers = Nil, cookies = Nil, 200)
+      }
+    }
+
+    LiftRules.statelessDispatch.append(ImageDownload)
   }
 
   def shutdown {

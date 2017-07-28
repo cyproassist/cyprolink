@@ -9,5 +9,4 @@
             replacement="platform:/plugin/de.cyproassist.web/META-INF/ontologies/lf-maint.ttl">
       </rule>
    </extension>
-
 </plugin>

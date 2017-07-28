@@ -14,6 +14,7 @@ Require-Bundle: org.scala-lang.scala-library,
 Import-Package: net.enilink.vocab.foaf,
  org.osgi.framework;version="1.7.0",
  org.osgi.util.tracker;version="1.5.1",
+ org.eclipse.osgi.service.datalocation,
  org.slf4j
 Lift-Packages: de.cyproassist.web
 Lift-Module: de.cyproassist.web.LiftModule

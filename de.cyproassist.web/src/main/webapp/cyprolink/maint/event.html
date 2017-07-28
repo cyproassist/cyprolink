@@ -12,19 +12,19 @@
 		data-lift="head"></link>
 
 	<style data-lift="head">
-.instructions {
+.elementlist ul {
 	list-style: none;
 	padding: 0px;
 }
 
-.instructions li {
+.elementlist li {
 	border: 1px solid grey;
 	margin: 4px;
 	padding: 5px;
 	position: relative;
 }
 
-.instructions li a {
+.elementlist li a {
 	opacity: 1.0;
 }
 
@@ -32,16 +32,17 @@ span[lang]::before {
 	content: "";
 }
 
-.instructions li .arrows {
+.elementlist li .arrows {
 	visibility: hidden;
 }
 
-.instructions li:hover .arrows {
+.elementlist li:hover .arrows {
 	visibility: visible;
 }
 
 div.add-element {
 	margin: 4px;
+	cursor: pointer;
 }
 </style>
 
@@ -49,29 +50,14 @@ div.add-element {
 		require.config({
 			urlArgs : "bust=" + (new Date()).getTime(),
 			paths : {
-				instructions : "/cyprolink/js/instructions"
+				elementlist : "/cyprolink/js/elementlist"
 			}
 		});
 
 		$(function() {
-			require([ "instructions" ], function(instructions) {
-				instructions.attachTo(".instructions", {
-					orderRel : "lf-maint:nextActivity"
-				});
-			});
-
-			var addBtn = $('.add-element');
-			addBtn.find('i').click(function() {
-				addBtn.editable({
-					type : "text",
-					onblur : "ignore",
-					inputclass : "editable-form-control",
-					emptyclass : "",
-					emptytext : "",
-					mode : "inline",
-					toggle : "manual"
-				});
-				addBtn.editable("show");
+			require([ "elementlist" ], function(elementlist) {
+				elementlist.attachTo(".details");
+				elementlist.attachTo(".instructions");
 			});
 		});
 	</script>
@@ -122,15 +108,59 @@ div.add-element {
 
 		<!-- textarea class="query"></textarea -->
 
-		<div data-pattern="?this lf-maint:nextActivity+ ?ins">
-			<ul class="instructions">
+		<div class="details elementlist">
+			<h3>Details</h3>
+
+			<ul class="optional" data-next-rel="lf-maint:next">
 				<!-- invisible element is required to update pointer to the head element of the linked list -->
-				<li about="?this" style="display: none"><span
-					rel="lf-maint:nextActivity" resource="?" class="optional"
-					style="display: none"></span></li>
+				<li about="?this" style="display: none"
+					data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
+					resource="?firstDetail" class="next"></span></li>
+
+				<li data-pattern="?firstDetail lf-maint:next* ?detail"
+					class="clearable"></li>
+
+				<li about="?detail" data-t="detail">
+					<!-- the image --> <div><img src="../images/{}" about="?detail"
+					property="lf-maint:file" content="?" class="optional"
+					data-lift="rdf.label?to=src"></img></div>
+
+					<div rel="lf-maint:next" resource="?" class="optional next"
+						style="display: none"></div> <!-- the link --> <a
+					class="btn-hover" href="{app}/describe?model={model}&resource={}"
+					data-lift="rdf.ref?to=href"> <!-- the text label --> <span
+						about="?detail" property="lf-maint:text" content="?detailText"
+						class="optional" data-lift="rdf.label"></span> <!-- fall back: the URI -->
+						<span data-unless="?detailText" about="?detail"
+						data-lift="rdf.label"></span>
+				</a>
+
+					<div style="float: right" class="arrows">
+						<a href="javascript://"><i
+							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
+							class="glyphicon glyphicon-arrow-down"></i></a>
+					</div>
+				</li>
+			</ul>
+
+			<div class="add-element">
+				<i data-t="51" class="glyphicon glyphicon-plus"></i>
+			</div>
+		</div>
+
+		<div class="instructions elementlist">
+			<h3>Actions</h3>
+
+			<ul class="optional" data-next-rel="lf-maint:next">
+				<!-- invisible element is required to update pointer to the head element of the linked list -->
+				<li about="?this" style="display: none"
+					data-next-rel="lf-maint:action"><span rel="lf-maint:action"
+					resource="?firstIns" class="next"></span></li>
+
+				<li data-pattern="?firstIns lf-maint:next* ?ins" class="clearable"></li>
 
 				<li about="?ins" data-t="instruction">
-					<div rel="lf-maint:nextActivity" resource="?" class="optional"
+					<div rel="lf-maint:next" resource="?" class="optional next"
 						style="display: none"></div> <!-- the link --> <a
 					class="btn-hover" href="{app}/describe?model={model}&resource={}"
 					data-lift="rdf.ref?to=href"> <!-- the text label --> <span

@@ -2,7 +2,8 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 		defineComponent, utils, d3, simplify) {
 	return defineComponent(function() {
 		this.attributes({
-			orderRel : null
+			nextSel : '.next[rel]',
+			nextTpl : '<span style="display:none" class="next">'
 		});
 
 		function toposort(edges) {
@@ -62,9 +63,6 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 		}
 
 		this.updateOrder = function() {
-			var precedesSel = this.precedesSel;
-			var precedesTpl = this.precedesTpl;
-
 			var rdfBefore = $.rdf.databank();
 			$.each(arguments, function(i, elem) {
 				elem.rdf().databank.triples().get().forEach(function(triple) {
@@ -72,17 +70,22 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 				});
 			});
 
+			var nextSel = this.attr.nextSel;
+			var nextTpl = this.attr.nextTpl;
+
 			var rdfAfter = $.rdf.databank();
 			// update RDFa
 			$.each(arguments, function(i, elem) {
 				// remove old precedence statement
-				elem.find(precedesSel).remove();
+				elem.find(nextSel).remove();
 
 				var succResource = elem.next().attr("about");
 				if (succResource) {
 					// add new precedence statement
-					$(precedesTpl).attr("resource", succResource).prependTo(
-							elem);
+					var nextRel = elem.closest("[data-next-rel]").attr(
+							"data-next-rel");
+					$(nextTpl).attr("rel", nextRel).attr("resource",
+							succResource).prependTo(elem);
 				}
 
 				elem.rdf().databank.triples().get().forEach(function(triple) {
@@ -98,10 +101,8 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 		}
 
 		this.after('initialize', function() {
-			var precedesSel = this.precedesSel = '[rel="' + this.attr.orderRel
-					+ '"]';
-			var precedesTpl = this.precedesTpl = '<span rel="'
-					+ this.attr.orderRel + '" style="display:none">';
+			var nextSel = this.attr.nextSel;
+			var nextTpl = this.attr.nextTpl;
 
 			var elements = this.$node.find("li");
 			// determine partial ordering
@@ -109,7 +110,7 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 					function() {
 						var self = $(this);
 						var uri = self.attr("resource") || self.attr("about");
-						return self.find(precedesSel).map(
+						return self.find(nextSel).map(
 								function() {
 									var succ = $(this).attr("resource")
 											|| $(this).attr("about");
@@ -172,8 +173,10 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 					// update precedence relationship
 					var pred = $(".processes li").last();
 					if (pred.length > 0) {
-						$(precedesTpl).attr("resource", newNode.attr("about"))
-								.prependTo(pred);
+						var nextRel = pred.closest("[data-next-rel]").attr(
+								"data-next-rel");
+						$(nextTpl).attr("rel", nextRel).attr("resource",
+								newNode.attr("about")).prependTo(pred);
 					}
 					// insert node and register event handlers
 					$(".processes").append(newNode);
@@ -182,6 +185,54 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 					return newNode;
 				}
 			}
+
+			var addBtn = this.$node.find('.add-element');
+			addBtn.find('i').click(function() {
+				addBtn.editable({
+					type : "text",
+					onblur : "ignore",
+					inputclass : "editable-form-control",
+					emptyclass : "",
+					emptytext : "",
+					mode : "inline",
+					toggle : "manual",
+					url : function(params) {
+						var d = new $.Deferred;
+						enilink.rdf.updateTriples({
+							"_:new-acl" : {
+								"http://www.w3.org/ns/auth/acl#accessTo" : [ {
+									value : target,
+									type : "uri"
+								} ],
+								"http://www.w3.org/ns/auth/acl#agent" : [ {
+									value : agent,
+									type : "uri"
+								} ],
+								"http://www.w3.org/ns/auth/acl#mode" : [ {
+									value : mode,
+									type : "uri"
+								} ]
+							}
+						}, function(success) {
+							enilink.render({
+								template : "item",
+								bind : {
+									item : uri
+								}
+							}, {
+								model : enilink.contextModel(this)
+							}, function(html) {
+								var div = $("#modal");
+								div.html(html);
+								div.find(".modal").modal("show");
+							});
+						});
+
+						return d.promise();
+					}
+				});
+				addBtn.editable("show");
+			});
 		});
 	});
 });
