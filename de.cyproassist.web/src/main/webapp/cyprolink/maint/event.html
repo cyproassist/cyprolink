@@ -11,59 +11,35 @@
 	<link rel="stylesheet" type="text/css" href="../css/app.css"
 		data-lift="head"></link>
 
+	<link rel="stylesheet" type="text/css" href="../css/event.css"
+		data-lift="head"></link>
+
 	<style data-lift="head">
-.elementlist ul {
-	list-style: none;
-	padding: 0px;
-}
-
-.elementlist li {
-	border: 1px solid grey;
-	margin: 4px;
-	padding: 5px;
-	position: relative;
-}
-
-.elementlist li a {
-	opacity: 1.0;
-}
-
-span[lang]::before {
-	content: "";
-}
-
-.elementlist li .arrows {
-	visibility: hidden;
-}
-
-.elementlist li:hover .arrows {
-	visibility: visible;
-}
-
-div.add-element {
-	margin: 4px;
-	cursor: pointer;
-}
 </style>
 
 	<script data-lift="head">
 		require.config({
 			urlArgs : "bust=" + (new Date()).getTime(),
 			paths : {
-				elementlist : "/cyprolink/js/elementlist"
+				elementlist : "/cyprolink/js/elementlist",
+				"elementlist-helper" : "/cyprolink/js/elementlist-helper"
 			}
 		});
 
 		$(function() {
-			require([ "elementlist" ], function(elementlist) {
-				elementlist.attachTo(".details");
-				elementlist.attachTo(".instructions");
+			require([ "elementlist", "elementlist-helper" ], function(elementlist, helper) {
+				elementlist.mixin(helper).attachTo(".details", {
+					itemType : 'http://linkedfactory.org/vocab/maintenance#Component',
+					itemTemplate : 'detail',
+					itemVariable : 'detail'
+				});
+				elementlist.mixin(helper).attachTo(".instructions", {
+					itemType : 'http://linkedfactory.org/vocab/maintenance#Activity',
+					itemTemplate : 'instruction',
+					itemVariable : 'ins'
+				});
 			});
-		});
-	</script>
 
-	<script data-lift="head">
-		$(function() {
 			var $language = $('.language');
 
 			var params = enilink.params();
@@ -85,6 +61,10 @@ div.add-element {
 			$language.change(function() {
 				params.lang = $(this).val();
 				window.location.search = enilink.encodeParams(params);
+			});
+
+			$('li img').each(function() {
+				$(this).closest('li').addClass('skip');
 			});
 		});
 	</script>
@@ -121,9 +101,11 @@ div.add-element {
 					class="clearable"></li>
 
 				<li about="?detail" data-t="detail">
-					<!-- the image --> <div><img src="../images/{}" about="?detail"
-					property="lf-maint:file" content="?" class="optional"
-					data-lift="rdf.label?to=src"></img></div>
+					<!-- the image -->
+					<div>
+						<img src="../images/{}" about="?detail" property="lf-maint:file"
+							content="?" class="optional" data-lift="rdf.label?to=src"></img>
+					</div>
 
 					<div rel="lf-maint:next" resource="?" class="optional next"
 						style="display: none"></div> <!-- the link --> <a
@@ -138,7 +120,9 @@ div.add-element {
 					<div style="float: right" class="arrows">
 						<a href="javascript://"><i
 							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-down"></i></a>
+							class="glyphicon glyphicon-arrow-down"></i></a><a
+							href="javascript://" style="margin-left: 20px"><i
+							class="glyphicon glyphicon-trash"></i></a>
 					</div>
 				</li>
 			</ul>
@@ -172,7 +156,9 @@ div.add-element {
 					<div style="float: right" class="arrows">
 						<a href="javascript://"><i
 							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-down"></i></a>
+							class="glyphicon glyphicon-arrow-down"></i></a> <a
+							href="javascript://" style="margin-left: 20px"><i
+							class="glyphicon glyphicon-trash"></i></a>
 					</div>
 				</li>
 			</ul>

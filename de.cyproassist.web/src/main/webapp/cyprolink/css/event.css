@@ -1,0 +1,46 @@
+.elementlist ul {
+	list-style: none;
+	padding: 0px;
+}
+
+.elementlist li {
+	border: 1px solid grey;
+	margin: 4px;
+	padding: 5px;
+	position: relative;
+}
+
+.elementlist li a {
+	opacity: 1.0;
+}
+
+span[lang]::before {
+	content: "";
+}
+
+.elementlist li .arrows {
+	visibility: hidden;
+}
+
+.elementlist li:hover .arrows {
+	visibility: visible;
+}
+
+div.add-element {
+	margin: 4px;
+	cursor: pointer;
+}
+
+/** Show numbers for components */
+
+.details ul {
+	counter-reset: item;
+}
+
+.details li:not(.skip) {
+	counter-increment: item;
+}
+
+.details li:not(.skip ) > a:before {
+	content: counter(item) ".";
+}

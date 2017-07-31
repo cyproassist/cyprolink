@@ -1,11 +1,13 @@
-define([ "flight/lib/component", "flight/lib/utils" ], function(
-		defineComponent, utils, d3, simplify) {
+define([ "flight/lib/component", "flight/lib/utils" ], function(defineComponent, utils, d3, simplify) {
 	return defineComponent(function() {
 		this.attributes({
 			nextSel : '.next[rel]',
 			nextTpl : '<span style="display:none" class="next">'
 		});
 
+		/**
+		 * Simple topological sort implementation for sorting the element list.
+		 */
 		function toposort(edges) {
 			var nodes = {}, // hash: stringified node id => node
 			sorted = [], // sorted list of IDs ( returned value )
@@ -27,41 +29,42 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 			});
 
 			// 2. topological sort
-			Object.keys(nodes).forEach(
-					function visit(idstr, ancestors) {
-						var node = nodes[idstr], id = node.id;
+			Object.keys(nodes).forEach(function visit(idstr, ancestors) {
+				var node = nodes[idstr], id = node.id;
 
-						// if already exists, do nothing
-						if (visited[idstr]) {
+				// if already exists, do nothing
+				if (visited[idstr]) {
+					return;
+				}
+
+				if (!Array.isArray(ancestors)) {
+					ancestors = [];
+				}
+
+				ancestors.push(id);
+				visited[idstr] = true;
+
+				node.successors.forEach(function(afterID) {
+					if (ancestors.indexOf(afterID) >= 0) // if
+						// already in ancestors, a closed chain exists.
+						if (window.console) {
+							console.log('Closed chain: ' + afterID + ' is already predecessor of ' + id);
 							return;
 						}
+					// recursive call
+					visit(afterID.toString(), ancestors.slice());
+				});
 
-						if (!Array.isArray(ancestors)) {
-							ancestors = [];
-						}
-
-						ancestors.push(id);
-						visited[idstr] = true;
-
-						node.successors.forEach(function(afterID) {
-							if (ancestors.indexOf(afterID) >= 0) // if
-								// already in ancestors, a closed chain exists.
-								if (window.console) {
-									console.log('Closed chain: ' + afterID
-											+ ' is already predecessor of '
-											+ id);
-									return;
-								}
-							// recursive call
-							visit(afterID.toString(), ancestors.slice());
-						});
-
-						sorted.unshift(id);
-					});
+				sorted.unshift(id);
+			});
 
 			return sorted;
 		}
 
+		/**
+		 * Updates the ordering relationships/properties between the given DOM
+		 * nodes according to their current order in the DOM tree.
+		 */
 		this.updateOrder = function() {
 			var rdfBefore = $.rdf.databank();
 			$.each(arguments, function(i, elem) {
@@ -82,10 +85,8 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 				var succResource = elem.next().attr("about");
 				if (succResource) {
 					// add new precedence statement
-					var nextRel = elem.closest("[data-next-rel]").attr(
-							"data-next-rel");
-					$(nextTpl).attr("rel", nextRel).attr("resource",
-							succResource).prependTo(elem);
+					var nextRel = elem.closest("[data-next-rel]").attr("data-next-rel");
+					$(nextTpl).attr("rel", nextRel).attr("resource", succResource).prependTo(elem);
 				}
 
 				elem.rdf().databank.triples().get().forEach(function(triple) {
@@ -100,46 +101,63 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 			});
 		}
 
-		this.after('initialize', function() {
-			var nextSel = this.attr.nextSel;
-			var nextTpl = this.attr.nextTpl;
-
-			var elements = this.$node.find("li");
-			// determine partial ordering
-			var edges = elements.map(
-					function() {
-						var self = $(this);
-						var uri = self.attr("resource") || self.attr("about");
-						return self.find(nextSel).map(
-								function() {
-									var succ = $(this).attr("resource")
-											|| $(this).attr("about");
-									return [ [ uri, succ ] ];
-								}).get();
-					}).get();
-
-			// sort elements
-			var prev = null;
-			$.each(toposort(edges), function(index, value) {
-				var element = elements.filter('[resource="' + value
-						+ '"],[about="' + value + '"]');
-				if (prev) {
-					element.insertAfter(prev);
-				}
-				if (element.length) {
-					prev = element;
-				}
-			});
-
-			// register click handlers for up/down actions
-			function addHandlers(parent) {
-				parent.find(".glyphicon-arrow-up").closest("a").click(up);
-				parent.find(".glyphicon-arrow-down").closest("a").click(down);
-			}
-			addHandlers(this.$node);
-
+		/**
+		 * Creates an 'Add' button for new elements.
+		 */
+		this.createAddButton = function() {
 			var component = this;
 
+			var addBtn = this.$node.find('.add-element');
+			var options = {
+				type : "typeaheadjs",
+				onblur : "ignore",
+				inputclass : "editable-form-control",
+				emptyclass : "",
+				emptytext : "",
+				mode : "inline",
+				toggle : "manual",
+				display : false
+			};
+
+			var timeoutID = null;
+			options.typeahead = [ {
+				minLength : 2
+			}, {
+				source : function(query, cb) {
+					if (timeoutID) {
+						clearTimeout(timeoutID);
+					}
+					timeoutID = window.setTimeout(function() {
+						component.computeProposals(query, cb);
+					}, 500);
+				},
+				displayKey : function(v) {
+					return v.content;
+				},
+				templates : {
+					suggestion : function(v) {
+						var t = $('<p />').css("white-space", "nowrap").text(v.label);
+						return $("<span />").append(t);
+					}
+				}
+			} ];
+
+			addBtn.editable($.extend(options, {
+				url : function(params) {
+					return component.createItem(params.value);
+				}
+			}));
+			// manually trigger the add button
+			addBtn.find('i').click(function() {
+				addBtn.editable("show");
+			});
+		}
+
+		/**
+		 * Register click handlers for moving elements up and down.
+		 */
+		this.addHandlers = function(parent) {
+			var component = this;
 			function up() {
 				var self = $(this).closest("li");
 				var pred = self.prev();
@@ -152,6 +170,7 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 					});
 				}
 			}
+			
 			function down() {
 				var self = $(this).closest("li");
 				var succ = self.next();
@@ -164,75 +183,54 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(
 					});
 				}
 			}
-
-			// overrides default onadd behavior to insert the nodes in a
-			// certain positions as well as to register event handlers
-			function onadd(response) {
-				if (response.html) {
-					var newNode = $(response.html);
-					// update precedence relationship
-					var pred = $(".processes li").last();
-					if (pred.length > 0) {
-						var nextRel = pred.closest("[data-next-rel]").attr(
-								"data-next-rel");
-						$(nextTpl).attr("rel", nextRel).attr("resource",
-								newNode.attr("about")).prependTo(pred);
-					}
-					// insert node and register event handlers
-					$(".processes").append(newNode);
-					enilink.ui.enableEdit(newNode);
-					addHandlers(newNode);
-					return newNode;
-				}
-			}
-
-			var addBtn = this.$node.find('.add-element');
-			addBtn.find('i').click(function() {
-				addBtn.editable({
-					type : "text",
-					onblur : "ignore",
-					inputclass : "editable-form-control",
-					emptyclass : "",
-					emptytext : "",
-					mode : "inline",
-					toggle : "manual",
-					url : function(params) {
-						var d = new $.Deferred;
-						enilink.rdf.updateTriples({
-							"_:new-acl" : {
-								"http://www.w3.org/ns/auth/acl#accessTo" : [ {
-									value : target,
-									type : "uri"
-								} ],
-								"http://www.w3.org/ns/auth/acl#agent" : [ {
-									value : agent,
-									type : "uri"
-								} ],
-								"http://www.w3.org/ns/auth/acl#mode" : [ {
-									value : mode,
-									type : "uri"
-								} ]
-							}
-						}, function(success) {
-							enilink.render({
-								template : "item",
-								bind : {
-									item : uri
-								}
-							}, {
-								model : enilink.contextModel(this)
-							}, function(html) {
-								var div = $("#modal");
-								div.html(html);
-								div.find(".modal").modal("show");
-							});
-						});
-
-						return d.promise();
+			
+			function remove() {
+				var self = $(this).closest("li");
+				var resource = self.resourceAttr("about").value.toString();
+				enilink.rdf.removeResource(resource, function (success) {
+					if (success) {
+						var prev = self.prev();
+						var next = self.next();
+						self.remove();
+						component.updateOrder(prev, next);
 					}
 				});
-				addBtn.editable("show");
+			}
+
+			parent.find(".glyphicon-arrow-up").closest("a").click(up);
+			parent.find(".glyphicon-arrow-down").closest("a").click(down);
+			parent.find(".glyphicon-trash").closest("a").click(remove);
+		}
+
+		this.after('initialize', function() {
+			var nextSel = this.attr.nextSel;
+			var nextTpl = this.attr.nextTpl;
+
+			var elements = this.$node.find("li");
+			// determine partial ordering
+			var edges = elements.map(function() {
+				var self = $(this);
+				var uri = self.attr("resource") || self.attr("about");
+				return self.find(nextSel).map(function() {
+					var succ = $(this).attr("resource") || $(this).attr("about");
+					return [ [ uri, succ ] ];
+				}).get();
+			}).get();
+
+			// sort elements
+			var prev = null;
+			$.each(toposort(edges), function(index, value) {
+				var element = elements.filter('[resource="' + value + '"],[about="' + value + '"]');
+				if (prev) {
+					element.insertAfter(prev);
+				}
+				if (element.length) {
+					prev = element;
+				}
 			});
+
+			this.addHandlers(this.$node);
+			this.createAddButton();
 		});
 	});
 });
