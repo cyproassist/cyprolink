@@ -57,7 +57,7 @@
 				}
 			});
 
-			$('[data-add="text"]').attr('data-lang', lang);
+			$('[data-add="text"],[data-content-empty]').attr('data-lang', lang);
 			$language.change(function() {
 				params.lang = $(this).val();
 				window.location.search = enilink.encodeParams(params);
@@ -72,9 +72,9 @@
 	<script data-lift="JS.templates"></script>
 	<script data-lift="JS.rdfa"></script>
 
-	<div about="?this" data-lift="rdfa">
+	<div about="?this" data-lift="rdfa" data-bind="?this as ?this">
 		<div>
-			<h3 style="display: inline-block" class="editable"
+			<h3 style="display: inline-block" class="editable optional keep"
 				property="lf-maint:text" content="?text" data-lift="rdf.label"></h3>
 
 			<div style="text-align: right; display: flex" class="pull-right">
