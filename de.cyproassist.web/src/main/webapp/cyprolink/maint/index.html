@@ -74,7 +74,8 @@
 				enilink.render({
 					template : "item",
 					bind : {
-						item : uri
+						item : uri,
+						currentLang : enilink.param("lang") || "de"
 					}
 				}, {
 					model : enilink.contextModel(items)
@@ -92,10 +93,9 @@
 				// set correct language for new elements
 				$(this).find('[data-add="text"]').attr('data-lang', lang);
 
-				var types = $(this).find('[rel="rdf:type"] [resource]').map(
-						function() {
-							return $(this).attr('resource');
-						}).get().join(' ').toLowerCase();
+				var types = $(this).find('[rel="rdf:type"] [resource]').map(function() {
+					return $(this).attr('resource');
+				}).get().join(' ').toLowerCase();
 
 				var labelType = 'info';
 				if (types.includes('fault')) {
@@ -117,8 +117,7 @@
 
 	<div data-lift="cyprolink/rdfaUtils.orderby">
 		<!-- use lang as param to filter non-relevant texts -->
-		<div data-lift="rdfa" data-params="?lang"
-			data-bind="if(bound(?lang), ?lang, &quot;de&quot;) as ?currentLang">
+		<div data-lift="rdfa">
 			<h3 style="display: inline-block">Meldungen</h3>
 
 			<div style="text-align: right; display: flex" class="pull-right">

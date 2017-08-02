@@ -44,3 +44,8 @@ div.add-element {
 .details li:not(.skip ) > a:before {
 	content: counter(item) ".";
 }
+
+.details img {
+	max-width: 640px;
+	max-height: 480 px;
+}

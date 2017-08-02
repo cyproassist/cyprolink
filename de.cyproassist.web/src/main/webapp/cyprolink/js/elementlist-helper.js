@@ -53,11 +53,13 @@ define([], function() {
 					"http://linkedfactory.org/vocab/maintenance#text" : [ {
 						value : value,
 						type : "literal",
-						lang : "de"
+						lang : enilink.param("lang") || "de"
 					} ]
 				}
 			}, function(uriMap) {
-				var bindParams = {};
+				var bindParams = {
+						currentLang : enilink.param("lang") || "de"
+				};
 				bindParams[component.attr.itemVariable] = uriMap['new:item-'];
 
 				enilink.render({

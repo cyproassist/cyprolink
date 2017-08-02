@@ -10,8 +10,14 @@ import net.liftweb.util.Helpers.appendParams
 import net.liftweb.util.Helpers.strToSuperArrowAssoc
 import net.liftweb.common.Box
 import net.liftweb.common.Empty
+import net.enilink.lift.snippet.QueryParams
+import scala.collection.immutable.Map
+import net.liftweb.http.PageName
 
 class RdfaUtils {
+  /**
+   * Supports data-orderby attribute for automatic link created to enable users to change the variables and direction for sorting.
+   */
   def orderby(ns: NodeSeq) = {
     val currentOrderBy = S.param("orderby") map { v =>
       v.split("\\s*!\\s*") match {

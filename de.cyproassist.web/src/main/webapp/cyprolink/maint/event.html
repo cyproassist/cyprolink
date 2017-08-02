@@ -48,14 +48,6 @@
 			}
 
 			var lang = $language.val();
-			$('[lang]').each(function() {
-				var $this = $(this);
-				if ($this.attr('lang') != lang) {
-					$this.hide();
-				} else {
-					$this.show();
-				}
-			});
 
 			$('[data-add="text"],[data-content-empty]').attr('data-lang', lang);
 			$language.change(function() {
@@ -75,7 +67,8 @@
 	<div about="?this" data-lift="rdfa" data-bind="?this as ?this">
 		<div>
 			<h3 style="display: inline-block" class="editable optional keep"
-				property="lf-maint:text" content="?text" data-lift="rdf.label"></h3>
+				property="lf-maint:text" content="?text" data-lift="rdf.label"
+				data-filter="lang(?text) = ?currentLang"></h3>
 
 			<div style="text-align: right; display: flex" class="pull-right">
 				<select class="form-control language">
@@ -86,7 +79,7 @@
 		</div>
 		<div class="clearfix"></div>
 
-		<!-- textarea class="query"></textarea -->
+		<!-- textarea class="query"></textarea-->
 
 		<div class="details elementlist">
 			<h3>Details</h3>
@@ -112,9 +105,8 @@
 					class="btn-hover" href="{app}/describe?model={model}&resource={}"
 					data-lift="rdf.ref?to=href"> <!-- the text label --> <span
 						about="?detail" property="lf-maint:text" content="?detailText"
-						class="optional" data-lift="rdf.label"></span> <!-- fall back: the URI -->
-						<span data-unless="?detailText" about="?detail"
-						data-lift="rdf.label"></span>
+						class="optional keep" data-lift="rdf.label"
+						data-filter="lang(?detailText) = ?currentLang"></span>
 				</a>
 
 					<div style="float: right" class="arrows">
@@ -149,8 +141,8 @@
 					class="btn-hover" href="{app}/describe?model={model}&resource={}"
 					data-lift="rdf.ref?to=href"> <!-- the text label --> <span
 						about="?ins" property="lf-maint:text" content="?insText"
-						class="optional" data-lift="rdf.label"></span> <!-- fall back: the URI -->
-						<span data-unless="?insText" about="?ins" data-lift="rdf.label"></span>
+						class="optional keep" data-lift="rdf.label"
+						data-filter="lang(?insText) = ?currentLang"></span>
 				</a>
 
 					<div style="float: right" class="arrows">
@@ -167,7 +159,7 @@
 				<i data-t="51" class="glyphicon glyphicon-plus"></i>
 			</div>
 		</div>
-
-		<div data-lift="embed?what=editsupport"></div>
 	</div>
+
+	<div data-lift="embed?what=editsupport"></div>
 </div>

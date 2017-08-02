@@ -28,6 +28,8 @@ import net.liftweb.http.rest.RestHelper
 import net.liftweb.sitemap.SiteMap
 import net.liftweb.util.Helpers.tryo
 import java.net.URL
+import net.liftweb.http.LiftSession
+import net.enilink.lift.snippet.QueryParams
 
 /**
  * This is the main class of the web module. It sets up and tears down the application.
@@ -49,7 +51,7 @@ class LiftModule {
     // determine the instance location (workspace)
     val ctx = FrameworkUtil.getBundle(getClass).getBundleContext
     val locService = ctx.getServiceReferences(classOf[Location], Location.INSTANCE_FILTER).headOption.map(ctx.getService(_))
-    
+
     // create default default model on start up if it does not already exist
     Globals.contextModelSet.vend map {
       ms =>
@@ -77,12 +79,23 @@ class LiftModule {
             val fileUrl = new URL(locService.get.getURL + "images/" + fileName + "." + ext.toLowerCase)
             Box !! new File(fileUrl.toURI)
           }
-          in <- tryo (new FileInputStream(file))
+          in <- tryo(new FileInputStream(file))
         } yield StreamingResponse(in, () => in.close(), file.length, headers = Nil, cookies = Nil, 200)
       }
     }
 
     LiftRules.statelessDispatch.append(ImageDownload)
+
+    // Initializes the SPARQL query parameter "currentLang" from the HTTP query parameter "lang" or a default value.
+    val setCurrentLang = ((session: LiftSession, req: Req) => {
+      req match {
+        case Req("cyprolink" :: _, _, _) =>
+          val currentLang = S.param("lang") openOr (S.attr("default") openOr "de")
+          QueryParams.set(QueryParams.get ++ Map("currentLang" -> currentLang))
+        case _ =>
+      }
+    }: Unit)
+    LiftSession.onBeginServicing = setCurrentLang :: LiftSession.onBeginServicing
   }
 
   def shutdown {
