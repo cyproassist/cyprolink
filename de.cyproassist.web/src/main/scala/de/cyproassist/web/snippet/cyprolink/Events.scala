@@ -17,6 +17,7 @@ import net.liftweb.util.Helpers.tryo
 import net.enilink.komma.core.URIs
 import de.cyproassist.web.util.DCTERMS
 import de.cyproassist.web.util.LF_MAINT
+import scala.xml.NodeSeq
 
 class Events {
   def create = SHtml.hidden(() => {
@@ -57,4 +58,14 @@ class Events {
       }) openOr JsCmds.Noop
     }
   }
+
+  /**
+   * Fill RDFa template from property list given by data-properties.
+   */
+  def listProperties = ".properties" #> ((pNode: NodeSeq) => {
+    val props = (pNode \@ "data-properties").split("\\s+").toSeq
+    props.flatMap { p =>
+      (".property [about]" #> p andThen ".property-value [rel]" #> p).apply(pNode \ "_")
+    }
+  })
 }

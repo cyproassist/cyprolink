@@ -30,6 +30,8 @@ import net.liftweb.util.Helpers.tryo
 import java.net.URL
 import net.liftweb.http.LiftSession
 import net.enilink.lift.snippet.QueryParams
+import net.liftweb.sitemap.Loc.EarlyResponse
+import net.liftweb.http.RedirectResponse
 
 /**
  * This is the main class of the web module. It sets up and tears down the application.
@@ -96,6 +98,13 @@ class LiftModule {
       }
     }: Unit)
     LiftSession.onBeginServicing = setCurrentLang :: LiftSession.onBeginServicing
+
+    // redirect to maintenance app until more content is added
+    LiftRules.dispatch.prepend {
+      case Req("cyprolink" :: (Nil | "index" :: Nil), _, _) => {
+        () => Full(RedirectResponse("/cyprolink/maint/"))
+      }
+    }
   }
 
   def shutdown {

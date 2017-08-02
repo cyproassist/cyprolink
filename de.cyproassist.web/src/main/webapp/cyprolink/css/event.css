@@ -49,3 +49,11 @@ div.add-element {
 	max-width: 640px;
 	max-height: 480 px;
 }
+
+.property {
+	font-weight: bold;
+}
+
+.property::after {
+	content: ":";
+}

@@ -64,99 +64,108 @@
 	<script data-lift="JS.templates"></script>
 	<script data-lift="JS.rdfa"></script>
 
-	<div about="?this" data-lift="rdfa" data-bind="?this as ?this">
-		<div>
-			<h3 style="display: inline-block" class="editable optional keep"
-				property="lf-maint:text" content="?text" data-lift="rdf.label"
-				data-filter="lang(?text) = ?currentLang"></h3>
+	<div data-lift="cyprolink/Events.listProperties">
+		<div about="?this" data-lift="rdfa" data-bind="?this as ?this">
+			<div>
+				<h3 style="display: inline-block" class="editable optional keep"
+					property="lf-maint:text" content="?text" data-lift="rdf.label"
+					data-filter="lang(?text) = ?currentLang"></h3>
 
-			<div style="text-align: right; display: flex" class="pull-right">
-				<select class="form-control language">
-					<option value="de">Deutsch</option>
-					<option value="en">Englisch</option>
-				</select>
+				<div style="text-align: right; display: flex" class="pull-right">
+					<select class="form-control language">
+						<option value="de">Deutsch</option>
+						<option value="en">Englisch</option>
+					</select>
+				</div>
 			</div>
-		</div>
-		<div class="clearfix"></div>
 
-		<!-- textarea class="query"></textarea-->
-
-		<div class="details elementlist">
-			<h3>Details</h3>
-
-			<ul class="optional" data-next-rel="lf-maint:next">
-				<!-- invisible element is required to update pointer to the head element of the linked list -->
-				<li about="?this" style="display: none"
-					data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
-					resource="?firstDetail" class="next"></span></li>
-
-				<li data-pattern="?firstDetail lf-maint:next* ?detail"
-					class="clearable"></li>
-
-				<li about="?detail" data-t="detail">
-					<!-- the image -->
-					<div>
-						<img src="../images/{}" about="?detail" property="lf-maint:file"
-							content="?" class="optional" data-lift="rdf.label?to=src"></img>
-					</div>
-
-					<div rel="lf-maint:next" resource="?" class="optional next"
-						style="display: none"></div> <!-- the link --> <a
-					class="btn-hover" href="{app}/describe?model={model}&resource={}"
-					data-lift="rdf.ref?to=href"> <!-- the text label --> <span
-						about="?detail" property="lf-maint:text" content="?detailText"
-						class="optional keep" data-lift="rdf.label"
-						data-filter="lang(?detailText) = ?currentLang"></span>
-				</a>
-
-					<div style="float: right" class="arrows">
-						<a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-down"></i></a><a
-							href="javascript://" style="margin-left: 20px"><i
-							class="glyphicon glyphicon-trash"></i></a>
-					</div>
-				</li>
-			</ul>
-
-			<div class="add-element">
-				<i data-t="51" class="glyphicon glyphicon-plus"></i>
+			<div class="properties"
+				data-properties="lf-maint:correctedBy lf-maint:occursInLocation lf-maint:occursInMachine">
+				<div>
+					<span data-lift="rdf.!label" class="property"></span> <span
+						resource="?" data-lift="rdf.label" class="property-value"></span>
+				</div>
 			</div>
-		</div>
 
-		<div class="instructions elementlist">
-			<h3>Actions</h3>
+			<!-- textarea class="query"></textarea-->
 
-			<ul class="optional" data-next-rel="lf-maint:next">
-				<!-- invisible element is required to update pointer to the head element of the linked list -->
-				<li about="?this" style="display: none"
-					data-next-rel="lf-maint:action"><span rel="lf-maint:action"
-					resource="?firstIns" class="next"></span></li>
+			<div class="details elementlist">
+				<h3>Details</h3>
 
-				<li data-pattern="?firstIns lf-maint:next* ?ins" class="clearable"></li>
+				<ul class="optional" data-next-rel="lf-maint:next">
+					<!-- invisible element is required to update pointer to the head element of the linked list -->
+					<li about="?this" style="display: none"
+						data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
+						resource="?firstDetail" class="next"></span></li>
 
-				<li about="?ins" data-t="instruction">
-					<div rel="lf-maint:next" resource="?" class="optional next"
-						style="display: none"></div> <!-- the link --> <a
-					class="btn-hover" href="{app}/describe?model={model}&resource={}"
-					data-lift="rdf.ref?to=href"> <!-- the text label --> <span
-						about="?ins" property="lf-maint:text" content="?insText"
-						class="optional keep" data-lift="rdf.label"
-						data-filter="lang(?insText) = ?currentLang"></span>
-				</a>
+					<li data-pattern="?firstDetail lf-maint:next* ?detail"
+						class="clearable"></li>
 
-					<div style="float: right" class="arrows">
-						<a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
-							class="glyphicon glyphicon-arrow-down"></i></a> <a
-							href="javascript://" style="margin-left: 20px"><i
-							class="glyphicon glyphicon-trash"></i></a>
-					</div>
-				</li>
-			</ul>
+					<li about="?detail" data-t="detail">
+						<!-- the image -->
+						<div>
+							<img src="../images/{}" about="?detail" property="lf-maint:file"
+								content="?" class="optional" data-lift="rdf.label?to=src"></img>
+						</div>
 
-			<div class="add-element">
-				<i data-t="51" class="glyphicon glyphicon-plus"></i>
+						<div rel="lf-maint:next" resource="?" class="optional next"
+							style="display: none"></div> <!-- the link --> <a
+						class="btn-hover" href="{app}/describe?model={model}&resource={}"
+						data-lift="rdf.ref?to=href"> <!-- the text label --> <span
+							about="?detail" property="lf-maint:text" content="?detailText"
+							class="optional keep" data-lift="rdf.label"
+							data-filter="lang(?detailText) = ?currentLang"></span>
+					</a>
+
+						<div style="float: right" class="arrows">
+							<a href="javascript://"><i
+								class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
+								class="glyphicon glyphicon-arrow-down"></i></a><a
+								href="javascript://" style="margin-left: 20px"><i
+								class="glyphicon glyphicon-trash"></i></a>
+						</div>
+					</li>
+				</ul>
+
+				<div class="add-element">
+					<i data-t="51" class="glyphicon glyphicon-plus"></i>
+				</div>
+			</div>
+
+			<div class="instructions elementlist">
+				<h3>Actions</h3>
+
+				<ul class="optional" data-next-rel="lf-maint:next">
+					<!-- invisible element is required to update pointer to the head element of the linked list -->
+					<li about="?this" style="display: none"
+						data-next-rel="lf-maint:action"><span rel="lf-maint:action"
+						resource="?firstIns" class="next"></span></li>
+
+					<li data-pattern="?firstIns lf-maint:next* ?ins" class="clearable"></li>
+
+					<li about="?ins" data-t="instruction">
+						<div rel="lf-maint:next" resource="?" class="optional next"
+							style="display: none"></div> <!-- the link --> <a
+						class="btn-hover" href="{app}/describe?model={model}&resource={}"
+						data-lift="rdf.ref?to=href"> <!-- the text label --> <span
+							about="?ins" property="lf-maint:text" content="?insText"
+							class="optional keep" data-lift="rdf.label"
+							data-filter="lang(?insText) = ?currentLang"></span>
+					</a>
+
+						<div style="float: right" class="arrows">
+							<a href="javascript://"><i
+								class="glyphicon glyphicon-arrow-up"></i></a><a href="javascript://"><i
+								class="glyphicon glyphicon-arrow-down"></i></a> <a
+								href="javascript://" style="margin-left: 20px"><i
+								class="glyphicon glyphicon-trash"></i></a>
+						</div>
+					</li>
+				</ul>
+
+				<div class="add-element">
+					<i data-t="51" class="glyphicon glyphicon-plus"></i>
+				</div>
 			</div>
 		</div>
 	</div>
