@@ -18,6 +18,8 @@ import net.enilink.komma.core.URIs
 import de.cyproassist.web.util.DCTERMS
 import de.cyproassist.web.util.LF_MAINT
 import scala.xml.NodeSeq
+import scala.xml.Elem
+import scala.xml.UnprefixedAttribute
 
 class Events {
   def create = SHtml.hidden(() => {
@@ -62,10 +64,15 @@ class Events {
   /**
    * Fill RDFa template from property list given by data-properties.
    */
-  def listProperties = ".properties" #> ((pNode: NodeSeq) => {
-    val props = (pNode \@ "data-properties").split("\\s+").toSeq
-    props.flatMap { p =>
-      (".property [about]" #> p andThen ".property-value [rel]" #> p).apply(pNode \ "_")
-    }
+  def listProperties = ".properties" #> ((pNode: NodeSeq) => pNode match {
+    case elem: Elem =>
+      val props = (pNode \@ "data-properties").split("\\s+").toSeq
+      val newChild = props.flatMap { p =>
+        (".property [about]" #> p &
+          ".property-value" #> {
+            "^ [rel]" #> p andThen "^ [class+]" #> "editable keep optional"
+          }).apply(elem.child)
+      }
+      elem.copy(child = newChild)
   })
 }
