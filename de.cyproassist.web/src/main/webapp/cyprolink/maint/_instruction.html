@@ -1,0 +1,40 @@
+<div class="instructions elementlist"
+	prefix="
+rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+rdfs: http://www.w3.org/2000/01/rdf-schema#
+lf-maint: http://linkedfactory.org/vocab/maintenance#">
+	<div rel="rdf:type" class="clearable">
+		<span resource="lf-maint:Instruction"></span>
+	</div>
+
+	<ul data-next-rel="lf-maint:next" class="items-list">
+		<!-- invisible element is required to update pointer to the head element of the linked list -->
+		<li about="?detail" style="display: none"
+			data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
+			resource="?firstIns" class="next"></span></li>
+
+		<li data-pattern="?firstIns lf-maint:next* ?ins" class="clearable"></li>
+
+		<li about="?ins" data-t="activity">
+			<div rel="lf-maint:next" resource="?" class="optional next"
+				style="display: none"></div> <!-- the link --> <a class="btn-hover"
+			href="{app}/describe?model={model}&resource={}"
+			data-lift="rdf.ref?to=href"> <!-- the text label --> <span
+				about="?ins" property="rdfs:label" content="?insText"
+				class="optional keep" data-lift="rdf.label"
+				data-filter="lang(?insText) = ?currentLang"></span>
+		</a>
+
+			<div style="float: right" class="arrows">
+				<a href="javascript://"><i class="glyphicon glyphicon-arrow-up"></i></a><a
+					href="javascript://"><i class="glyphicon glyphicon-arrow-down"></i></a>
+				<a href="javascript://" style="margin-left: 20px"><i
+					class="glyphicon glyphicon-trash"></i></a>
+			</div>
+		</li>
+	</ul>
+
+	<div class="add-element">
+		<i data-t="51" class="glyphicon glyphicon-plus"></i>
+	</div>
+</div>

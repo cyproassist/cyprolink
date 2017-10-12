@@ -159,7 +159,7 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(defineComponent,
 		this.addHandlers = function(parent) {
 			var component = this;
 			function up() {
-				var self = $(this).closest("li");
+				var self = $(this).closest(".item");
 				var pred = self.prev();
 				if (pred.length && pred.is(':visible')) {
 					var pred2 = pred.prev();
@@ -172,7 +172,7 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(defineComponent,
 			}
 			
 			function down() {
-				var self = $(this).closest("li");
+				var self = $(this).closest(".item");
 				var succ = self.next();
 				if (succ.length) {
 					var pred = self.prev();
@@ -185,7 +185,7 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(defineComponent,
 			}
 			
 			function remove() {
-				var self = $(this).closest("li");
+				var self = $(this).closest(".item");
 				var resource = self.resourceAttr("about").value.toString();
 				enilink.rdf.removeResource(resource, function (success) {
 					if (success) {
@@ -206,7 +206,9 @@ define([ "flight/lib/component", "flight/lib/utils" ], function(defineComponent,
 			var nextSel = this.attr.nextSel;
 			var nextTpl = this.attr.nextTpl;
 
-			var elements = this.$node.find("li");
+			var elements = this.$node.find('.items-list').children();
+			elements.addClass('item');
+			
 			// determine partial ordering
 			var edges = elements.map(function() {
 				var self = $(this);
