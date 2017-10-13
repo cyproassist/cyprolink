@@ -3,15 +3,10 @@
 rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
 rdfs: http://www.w3.org/2000/01/rdf-schema#
 lf-maint: http://linkedfactory.org/vocab/maintenance#">
-	<div rel="rdf:type" class="clearable">
-		<span resource="lf-maint:Instruction"></span>
-	</div>
-
-	<ul data-next-rel="lf-maint:next" class="items-list">
+	<ul data-next-rel="lf-maint:next" class="items-list optional">
 		<!-- invisible element is required to update pointer to the head element of the linked list -->
-		<li about="?detail" style="display: none"
-			data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
-			resource="?firstIns" class="next"></span></li>
+		<li style="display: none" data-next-rel="lf-maint:detail"><span
+			rel="lf-maint:detail" resource="?firstIns" class="next"></span></li>
 
 		<li data-pattern="?firstIns lf-maint:next* ?ins" class="clearable"></li>
 

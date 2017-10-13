@@ -3,16 +3,14 @@
 rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
 rdfs: http://www.w3.org/2000/01/rdf-schema#
 lf-maint: http://linkedfactory.org/vocab/maintenance#">
-	<div rel="rdf:type" class="clearable">
+	<!-- div rel="rdf:type" class="clearable">
 		<span resource="lf-maint:Component"></span>
-	</div>
+	</div-->
 
-	<h3>Actions</h3>
 	<ul data-next-rel="lf-maint:next" class="items-list">
 		<!-- invisible element is required to update pointer to the head element of the linked list -->
-		<li about="?detail" style="display: none"
-			data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
-			resource="?firstComp" class="next"></span></li>
+		<li style="display: none" data-next-rel="lf-maint:detail"><span
+			rel="lf-maint:detail" resource="?firstComp" class="next"></span></li>
 
 		<li data-pattern="?firstComp lf-maint:next* ?comp" class="clearable"></li>
 
@@ -34,6 +32,7 @@ lf-maint: http://linkedfactory.org/vocab/maintenance#">
 			</div>
 		</li>
 	</ul>
+	
 	<div class="add-element">
 		<i data-t="51" class="glyphicon glyphicon-plus"></i>
 	</div>

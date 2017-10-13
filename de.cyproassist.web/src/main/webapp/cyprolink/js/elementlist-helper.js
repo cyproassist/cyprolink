@@ -25,7 +25,7 @@ define([], function() {
 			enilink.render({
 				what : createQuery(this.attr.itemType, query)
 			}, {
-				model : enilink.param("model")
+				model : enilink.contextModel(this.node)
 			}, function(html) {
 				var items = $(html).find("[data-text]").map(function() {
 					var v = $(this).attr("data-text");
@@ -68,7 +68,7 @@ define([], function() {
 					template : component.attr.itemTemplate,
 					bind : bindParams
 				}, {
-					model : enilink.contextModel(this)
+					model : enilink.contextModel(component.node)
 				}, function(html) {
 					var newItem = $(html);
 					newItem.appendTo(component.$node.find('.items-list'));

@@ -33,20 +33,25 @@ div.add-element {
 
 /** Show numbers for components */
 
-.details ul {
+.components ul {
 	counter-reset: item;
 }
 
-.details li:not(.skip) {
+.components li:not(.skip) {
 	counter-increment: item;
 }
 
-.details li:not(.skip ) > a:before {
+.components li:not(.skip ) > a:before {
 	content: counter(item) ".";
 }
 
-.details img {
-	max-width: 640px;
+.image {
+	position: relative;
+	width: 100%;
+}
+
+.image img {
+	max-width: 100%;
 	max-height: 480 px;
 }
 

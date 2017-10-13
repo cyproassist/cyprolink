@@ -28,12 +28,14 @@
 
 		$(function() {
 			require([ "elementlist", "elementlist-helper" ], function(elementlist, helper) {
-				elementlist.mixin(helper).attachTo(".details", {
+				var listWithCreate = elementlist.mixin(helper);
+				listWithCreate.attachTo(".components", {
 					itemType : 'http://linkedfactory.org/vocab/maintenance#Component',
-					itemTemplate : 'detail',
-					itemVariable : 'detail'
+					itemFile : 'cyprolink/maint/_component',
+					itemTemplate : 'component',
+					itemVariable : 'comp'
 				});
-				elementlist.mixin(helper).attachTo(".instructions", {
+				listWithCreate.mixin(helper).attachTo(".instructions", {
 					itemType : 'http://linkedfactory.org/vocab/maintenance#Activity',
 					itemFile : 'cyprolink/maint/_instruction',
 					itemTemplate : 'activity',
@@ -102,9 +104,10 @@
 								data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
 								resource="?firstDetail" class="next"></span></li>
 
-							<div about="?detail" class="union col-md-4">
+							<div about="?detail" class="union col-md-4"
+								>
 								<!-- the image -->
-								<div data-if="?file">
+								<div data-if="?file" class="col-md-4 image">
 									<div rel="rdf:type" class="clearable">
 										<span resource="lf-maint:Image"></span>
 									</div>
@@ -118,7 +121,13 @@
 									</div>
 								</div>
 
-								<div data-embed="cyprolink/maint/_instruction"></div>
+								<div data-if="?instructionType">
+									<div rel="rdf:type" class="clearable">
+										<span resource="?instructionType"
+											data-pattern="?instructionType <x:y>? lf-maint:Instruction"></span>
+									</div>
+									<div data-embed="cyprolink/maint/_instruction"></div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -126,6 +135,6 @@
 			</div>
 		</div>
 	</div>
-
+	
 	<div data-lift="embed?what=editsupport"></div>
 </div>

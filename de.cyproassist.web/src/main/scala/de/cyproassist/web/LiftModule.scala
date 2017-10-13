@@ -83,10 +83,25 @@ class LiftModule {
     }
 
     object ImageDownload extends RestHelper {
+      lazy val nameMapping : Map[String, String] = {
+        val mappingFile = new File(new URL(locService.get.getURL + "images/mappings.txt").toURI)
+        if (mappingFile.exists) {
+          io.Source.fromFile(mappingFile).getLines.map { line =>
+            val Array(key, value, _*) = line.split("\\t")
+            println(key.trim.toLowerCase, value.trim)
+            (key.trim.toLowerCase, value.trim)
+          }.toMap
+        } else {
+          Map.empty
+        }
+      }
+      
       serve {
         case Req("cyprolink" :: "images" :: fileName :: Nil, ext, GetRequest) => for {
           file <- {
-            val fileUrl = new URL(locService.get.getURL + "images/" + fileName + "." + ext.toLowerCase)
+            var nameWithExt = fileName + "." + ext
+            nameWithExt = nameMapping.getOrElse(nameWithExt.toLowerCase, nameWithExt)
+            val fileUrl = new URL(locService.get.getURL + "images/" + nameWithExt)
             Box !! new File(fileUrl.toURI)
           }
           in <- tryo(new FileInputStream(file))
