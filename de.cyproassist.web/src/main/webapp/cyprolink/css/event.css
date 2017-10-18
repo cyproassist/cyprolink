@@ -1,3 +1,7 @@
+.elementlist {
+	padding-top: 5px;
+}
+
 .elementlist ul {
 	list-style: none;
 	padding: 0px;
@@ -8,6 +12,7 @@
 	margin: 4px;
 	padding: 5px;
 	position: relative;
+	background-color: white;
 }
 
 .elementlist li a {
@@ -31,6 +36,10 @@ div.add-element {
 	cursor: pointer;
 }
 
+div.add-element + .editable-inline {
+	margin: 5px;
+}
+
 /** Show numbers for components */
 
 .components ul {
@@ -47,12 +56,20 @@ div.add-element {
 
 .image {
 	position: relative;
-	width: 100%;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	padding-top: 5px;
+	background-color: #F3B562;
 }
 
 .image img {
-	max-width: 100%;
-	max-height: 480 px;
+	max-width: 95%;
+	max-height: 480px;
+}
+
+.instructions {
+	background-color: #8CBEB2;
 }
 
 .property {

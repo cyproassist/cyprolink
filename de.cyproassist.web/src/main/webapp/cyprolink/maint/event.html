@@ -86,7 +86,8 @@
 				data-properties="lf-maint:correctedBy lf-maint:occursInMachine lf-maint:occursInLocation">
 				<div>
 					<span data-lift="rdf.!label" class="property"></span> <span
-						resource="?" data-lift="rdf.label" class="property-value"></span>
+						resource="?pValue" class="property-value"><a href="../describe?resource={}&model={model}" data-lift="rdf.ref?to=href">
+						<span about="?pValue" data-lift="rdf.label"></span></a></span>
 				</div>
 			</div>
 
@@ -104,10 +105,9 @@
 								data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
 								resource="?firstDetail" class="next"></span></li>
 
-							<div about="?detail" class="union col-md-4"
-								>
-								<!-- the image -->
-								<div data-if="?file" class="col-md-4 image">
+							<div about="?detail" class="union col-md-4">
+								<!-- a detail image with optional components -->
+								<div data-if="?file" class="image">
 									<div rel="rdf:type" class="clearable">
 										<span resource="lf-maint:Image"></span>
 									</div>
@@ -116,11 +116,13 @@
 										property="lf-maint:file" content="?file" class="optional"
 										data-lift="rdf.label?to=src"></img>
 
+									<!-- components within the image -->
 									<div class="optional">
 										<div data-embed="cyprolink/maint/_component"></div>
 									</div>
 								</div>
 
+								<!-- a list of maintenance instructions -->
 								<div data-if="?instructionType">
 									<div rel="rdf:type" class="clearable">
 										<span resource="?instructionType"

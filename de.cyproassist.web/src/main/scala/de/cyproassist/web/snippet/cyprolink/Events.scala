@@ -20,6 +20,7 @@ import de.cyproassist.web.util.LF_MAINT
 import scala.xml.NodeSeq
 import scala.xml.Elem
 import scala.xml.UnprefixedAttribute
+import net.liftweb.util.Helpers._
 
 class Events {
   def create = SHtml.hidden(() => {
@@ -62,16 +63,40 @@ class Events {
   }
 
   /**
+   * Gives RDFa variables in an XML snippet a unique name.
+   */
+  def uniquifyVars(ns: NodeSeq) = {
+    val mapping = scala.collection.mutable.Map.empty[String, String]
+    def map(name: String) = mapping.getOrElseUpdate(name, name + "_" + nextFuncName)
+
+    def renameRecursive(ns: NodeSeq): NodeSeq = ns.flatMap {
+      case e: Elem => {
+        val renamed = List("about", "resource").foldLeft(e) {
+          case (e, attr) =>
+            val value = e \@ attr
+            if (value.startsWith("?")) {
+              e % (attr -> map(value))
+            } else e
+        }
+        renamed.copy(child = renameRecursive(e.child))
+      }
+      case o => o
+    }
+
+    renameRecursive(ns)
+  }
+
+  /**
    * Fill RDFa template from property list given by data-properties.
    */
   def listProperties = ".properties" #> ((pNode: NodeSeq) => pNode match {
     case elem: Elem =>
       val props = (pNode \@ "data-properties").split("\\s+").toSeq
       val newChild = props.flatMap { p =>
-        (".property [about]" #> p &
+        uniquifyVars((".property [about]" #> p &
           ".property-value" #> {
             "^ [rel]" #> p andThen "^ [class+]" #> "editable keep optional"
-          }).apply(elem.child)
+          }).apply(elem.child))
       }
       elem.copy(child = newChild)
   })
