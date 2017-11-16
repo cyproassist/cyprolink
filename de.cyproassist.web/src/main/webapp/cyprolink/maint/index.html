@@ -98,9 +98,9 @@
 				}).get().join(' ').toLowerCase();
 
 				var labelType = 'info';
-				if (types.includes('fault')) {
+				if (types.indexOf('fault') >= 0) {
 					labelType = 'danger';
-				} else if (types.includes('warning')) {
+				} else if (types.indexOf('warning') >= 0) {
 					labelType = 'warning';
 				}
 
