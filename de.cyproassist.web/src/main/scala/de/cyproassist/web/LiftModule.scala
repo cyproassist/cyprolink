@@ -34,6 +34,7 @@ import net.liftweb.http.rest.RestHelper
 import net.liftweb.sitemap.SiteMap
 import net.liftweb.util.Helpers.tryo
 import net.enilink.core.security.SecurityUtil
+import de.cyproassist.web.vui.VuiFeedback
 
 /**
  * This is the main class of the web module. It sets up and tears down the application.
@@ -110,6 +111,9 @@ class LiftModule {
     }
 
     LiftRules.statelessDispatch.append(ImageDownload)
+    
+    // endpoint for voice user interface feedback
+    LiftRules.statelessDispatch.append(VuiFeedback)
 
     // Initializes the SPARQL query parameter "currentLang" from the HTTP query parameter "lang" or a default value.
     val setCurrentLang = ((session: LiftSession, req: Req) => {

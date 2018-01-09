@@ -61,8 +61,23 @@
 			$('li img').each(function() {
 				$(this).closest('li').addClass('skip');
 			});
+
+			// support for vui feedback via comet listener
+			var currentSubject = null;
+			$(document).on('vui-subject-changed', function(evt, data) {
+				if (currentSubject != null) {
+					$('[about="' + currentSubject + '"]').removeClass('vui-highlighted');
+				}
+				currentSubject = data.item;
+				if (currentSubject != null) {
+					$('[about="' + currentSubject + '"]').addClass('vui-highlighted');
+				}
+			});
 		});
 	</script>
+
+	<!-- comet listener for voice user interface -->
+	<div data-lift="comet?type=VuiFeedbackComet"></div>
 
 	<script data-lift="JS.templates"></script>
 	<script data-lift="JS.rdfa"></script>
@@ -86,8 +101,10 @@
 				data-properties="lf-maint:correctedBy lf-maint:occursInMachine lf-maint:occursInLocation">
 				<div>
 					<span data-lift="rdf.!label" class="property"></span> <span
-						resource="?pValue" class="property-value"><a href="../describe?resource={}&model={model}" data-lift="rdf.ref?to=href">
-						<span about="?pValue" data-lift="rdf.label"></span></a></span>
+						resource="?pValue" class="property-value"><a
+						href="../describe?resource={}&model={model}"
+						data-lift="rdf.ref?to=href"> <span about="?pValue"
+							data-lift="rdf.label"></span></a></span>
 				</div>
 			</div>
 
@@ -137,6 +154,6 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div data-lift="embed?what=editsupport"></div>
 </div>
