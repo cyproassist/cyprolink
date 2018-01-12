@@ -14,4 +14,6 @@ object LF_MAINT {
   val TYPE_EVENT = NS_URI.appendLocalPart("Event")
   
   val PROPERTY_NR = NS_URI.appendLocalPart("nr")
+  val PROPERTY_OCCURSINLOCATION = NS_URI.appendLocalPart("occursInLocation")
+  val PROPERTY_OCCURSINMACHINE = NS_URI.appendLocalPart("occursInMachine")
 }

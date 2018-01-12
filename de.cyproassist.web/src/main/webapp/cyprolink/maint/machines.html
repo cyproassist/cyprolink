@@ -59,7 +59,7 @@
 
 			// show dialog for the creation of a new element
 			$("#btn-add-item").click(function(e) {
-				enilink.render("cyprolink/maint/new-event", {
+				enilink.render("cyprolink/maint/new-machine", {
 					model : enilink.contextModel(this)
 				}, function(html) {
 					var div = $("#modal");
@@ -69,7 +69,7 @@
 			});
 
 			// append newly created element to the page
-			$(document).on("event-created", function(evt, uri) {
+			$(document).on("machine-created", function(evt, uri) {
 				var items = $("#items");
 				enilink.render({
 					template : "item",
@@ -92,19 +92,6 @@
 			function prepareItem() {
 				// set correct language for new elements
 				$(this).find('[data-add="text"]').attr('data-lang', lang);
-
-				var types = $(this).find('[rel="rdf:type"] [resource]').map(function() {
-					return $(this).attr('resource');
-				}).get().join(' ').toLowerCase();
-
-				var labelType = 'info';
-				if (types.indexOf('fault') >= 0) {
-					labelType = 'danger';
-				} else if (types.indexOf('warning') >= 0) {
-					labelType = 'warning';
-				}
-
-				$(this).find('.label').addClass('label-' + labelType);
 			}
 
 			// Add label classes for each event type			
@@ -118,7 +105,7 @@
 	<div data-lift="cyprolink/rdfaUtils.orderby">
 		<!-- use lang as param to filter non-relevant texts -->
 		<div data-lift="rdfa">
-			<h3 style="display: inline-block">Meldungen</h3>
+			<h3 style="display: inline-block">Maschinen</h3>
 
 			<div style="text-align: right; display: flex" class="pull-right">
 				<div class="search-form"></div>
@@ -133,16 +120,13 @@
 			<div class="clearfix"></div>
 
 			<section class="row header-top">
-				<div class="col-md-2">
-					<h4 data-orderby="item">Name</h4>
-				</div>
-				<div class="col-md-2">
-					<h4 data-orderby="nr!asc">Nummer</h4>
+				<div class="col-md-3">
+					<h4 data-orderby="item">Bezeichnung</h4>
 				</div>
 				<div class="col-md-6">
 					<h4>Text</h4>
 				</div>
-				<div class="col-md-2">
+				<div class="col-md-3">
 					<h4></h4>
 				</div>
 			</section>
@@ -151,48 +135,29 @@
 				<section data-t="item" about="?item" class="item">
 					<div rel="rdf:type">
 						<div class="union clearable">
-							<div resource="lf-maint:Event"></div>
-							<div resource="lf-maint:Fault"></div>
-							<div resource="lf-maint:Warning"></div>
-							<div resource="lf-maint:Information"></div>
+							<div resource="lf-maint:Machine"></div>
 						</div>
 						<div resource="?type"></div>
 					</div>
 
 					<div class="row">
-						<div class="col-md-2">
+						<div class="col-md-3">
 							<div class="content">
 								<h4 class="header-fluid" data-orderby="item">Name</h4>
 
 								<div>
-									<a href="{app}/maint/event?resource={}"
-										data-lift="rdf.ref?to=href"><span class="label"> <span
-											data-lift="rdf.name"></span></span></a>
-									<!--  markers -->
-									<span style="font-size: smaller"> <!-- details marker -->
-										<span rel="lf-maint:detail" resource="?" class="optional"><i
-											class="glyphicon glyphicon-file"></i></span> <!-- actions marker -->
-										<span rel="lf-maint:action" resource="?" class="optional"><i
-											class="glyphicon glyphicon-wrench"></i></span>
-									</span>
+									<a href="{app}/maint/events?model={model}&machine={}"
+										data-lift="rdf.ref?to=href"><span class="label label-info">
+											<span data-lift="rdf.name"></span>
+									</span></a>
 								</div>
 							</div>
 						</div>
-						<div class="col-md-2 optional">
-							<div class="content">
-								<h4 class="header-fluid" data-orderby="nr">Nummer</h4>
-								<div property="lf-maint:nr" content="?nr" data-lift="rdf.label"></div>
-							</div>
-						</div>
-
-						<div property="lf-maint:description" content="?searchText"
-									class="clearable optional"></div>
-
 						<div class="col-md-6 optional">
 							<div class="content" data-filter="lang(?text) = ?currentLang">
-								<h4 class="header-fluid">Text</h4>
+								<h4 class="header-fluid">Bezeichnung</h4>
 
-								<div property="lf-maint:description" content="?text" class="editable"
+								<div property="rdfs:label" content="?text" class="editable"
 									data-t="text" style="display: inline-box">
 									<span data-lift="rdf.label"></span>
 								</div>
@@ -203,7 +168,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-md-3">
 							<div class="content actions">
 								<a class="btn-delete-item btn-hover" href="javascript://"
 									data-lift="cyprolink/events.delete"><i

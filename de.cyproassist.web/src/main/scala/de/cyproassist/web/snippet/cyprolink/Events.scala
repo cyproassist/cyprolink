@@ -28,6 +28,7 @@ class Events {
       model <- Globals.contextModel.vend
       nr <- doAlert(paramNotEmpty("nr", "Bitte eine Nummer eingeben.") flatMap (nr => tryo(nr.toInt)))
       eventType <- doAlert(paramNotEmpty("type", "Bitte einen Typ eingeben.")).map(URIs.createURI(_))
+      location <- doAlert(paramNotEmpty("location", "Bitte eine Anlage auswählen.")).map(URIs.createURI(_))
     } yield {
       val em = model.getManager
       val query = em.createQuery("prefix lf-maint: <" + LF_MAINT.NS_URI + "> " +
@@ -41,7 +42,7 @@ class Events {
         S.param("description").filter(!_.isEmpty) foreach {
           desc => event.setRdfsComment(desc)
         }
-        event.set(LF_MAINT.PROPERTY_NR, nr)
+        event.set(LF_MAINT.PROPERTY_OCCURSINMACHINE, location)
         event.set(DCTERMS.PROPERTY_DATE, DatatypeFactory.newInstance.newXMLGregorianCalendar(new GregorianCalendar))
         Full(Run(s"$$(document).trigger('event-created', ['$event']);"))
       }

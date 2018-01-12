@@ -1,5 +1,7 @@
 <div class="modal fade" aria-hidden="true"
-	prefix="lf-maint: http://linkedfactory.org/vocab/maintenance# rdfs: http://www.w3.org/2000/01/rdf-schema#">
+	prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# 
+	lf-maint: http://linkedfactory.org/vocab/maintenance# 
+	rdfs: http://www.w3.org/2000/01/rdf-schema#">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<form data-lift="form">
@@ -35,18 +37,22 @@
 						</div>
 
 						<div class="form-group">
-							<label>Maschine</label>
-							<div data-lift="rdfa">
-								<select name="location" class="form-control">
-									<option class="clearable" about="?"
-										rel="lf-maint:occursInMachine" resource="?location"></option>
+							<label>Anlage</label>
+							<div data-lift="rdfa" data-params="?machine">
+								<div class="clearable">
+									<div data-if-param="machine" data-bind="?machine as ?location"></div>
+									<div data-unless-param="machine" about="?location"
+										rel="rdf:type" resource="lf-maint:Machine"></div>
+								</div>
 
+								<select name="location" class="form-control">
 									<option about="?location" value="$location"
 										data-lift="rdf.label"></option>
 								</select>
 								<div>
 									<span data-lift="bs.alert?id=alert-location"></span>
 								</div>
+								<textarea class="query"></textarea>
 							</div>
 						</div>
 						<div class="form-group">
@@ -55,7 +61,8 @@
 								<select name="component" class="form-control">
 									<option class="clearable" about="?"
 										rel="lf-maint:occursInLocation" resource="?location"></option>
-
+									
+									<option value=""></option>
 									<option about="?location" value="$location"
 										data-lift="rdf.label"></option>
 								</select>

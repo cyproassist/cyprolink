@@ -1,0 +1,136 @@
+<div data-lift="surround?with=default;at=content"
+	prefix="
+	rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+	foaf: http://xmlns.com/foaf/0.1/ 
+	owl: http://www.w3.org/2002/07/owl#
+	rdfs: http://www.w3.org/2000/01/rdf-schema#
+	dcterms: http://purl.org/dc/terms/">
+
+	<link rel="stylesheet" type="text/css" href="css/app.css"
+		data-lift="head"></link>
+
+	<style type="text/css" data-lift="head">
+#items>section:nth-child(2n+1) {
+	background-color: #F9F9F9;
+}
+
+.content {
+	padding: 5px;
+}
+</style>
+	<script type="text/javascript" data-lift="head">
+		$(function() {
+			$("#btn-add-project").click(function(e) {
+				enilink.render("/cyprolink/projects/new-project", {
+					model : enilink.contextModel(this)
+				}, function(html) {
+					var div = $("#modal");
+					div.html(html);
+					div.find(".modal").modal("show");
+				});
+			});
+			$(document).on("project-created", function(evt, uri) {
+				var items = $("#items");
+				enilink.render({
+					template : "item",
+					bind : {
+						item : uri
+					}
+				}, {
+					model : enilink.contextModel(items),
+				}, function(html) {
+					items.append(html);
+				});
+				$("#modal .modal").modal("hide");
+			});
+		});
+	</script>
+
+	<script data-lift="JS.templates"></script>
+	<script data-lift="JS.rdfa"></script>
+
+	<div data-lift="cyprolink/rdfaUtils.orderby">
+		<div data-lift="rdfa">
+			<h3 style="display: inline-block">Projects</h3>
+			<div style="text-align: right" class="pull-right">
+				<div class="search-form"></div>
+			</div>
+			<div class="clearfix"></div>
+
+			<div class="search-patterns" data-for="?item" data-param="q"></div>
+
+			<section class="row header-top">
+				<div class="col-md-4">
+					<h4 data-orderby="item">Name</h4>
+				</div>
+				<div class="col-md-3">
+					<h4 data-orderby="date!desc">Date</h4>
+				</div>
+				<div class="col-md-3">
+					<h4>Tags</h4>
+				</div>
+				<div class="col-md-2">
+					<h4>Actions</h4>
+				</div>
+			</section>
+			<div id="items">
+				<section data-t="item" about="?item">
+					<div rel="rdf:type" resource="foaf:Project"></div>
+
+					<div class="row">
+						<div class="col-md-4">
+							<div class="content">
+								<h4 class="header-fluid" data-orderby="item">Name</h4>
+								<a href="{app}/maint/?model={}" data-lift="rdf.ref?to=href"><span
+									data-lift="rdf.label"></span></a>
+							</div>
+						</div>
+						<div class="col-md-3 optional">
+							<div class="content">
+								<h4 class="header-fluid" data-orderby="date">Date</h4>
+								<div property="dcterms:date" content="?date"
+									data-lift="rdf.label"></div>
+							</div>
+						</div>
+						<div class="col-md-3 optional">
+							<div class="content">
+								<h4 class="header-fluid">Tags</h4>
+								<div rel="dcterms:subject" resource="?tag" class="editable"
+									data-t="subject">
+									<a
+										href="{app}/describe?model={model}&resource={}&inferred=false"
+										data-lift="rdf.ref?to=href"><span data-lift="rdf.label"></span></a>
+								</div>
+								<!-- a simple add button -->
+								<div data-rel="dcterms:subject" data-add="subject">
+									<i class="glyphicon glyphicon-plus"></i>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 optional">
+							<div class="content">
+								<h4 class="header-fluid">Actions</h4>
+								<a
+									href="{app}/describe?model={model}&resource={}&inferred=false"
+									data-lift="rdf.ref?to=href">describe</a> <a
+									class="btn-delete-item btn-hover" href="javascript://"
+									data-lift="cyprolink/projects.delete"><i
+									class="glyphicon glyphicon-trash"></i></a>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+
+			<section>
+				<a id="btn-add-project" class="btn btn-default btn-small"
+					href="javascript:void(0)"><i class="glyphicon glyphicon-plus"></i>
+					Create</a>
+			</section>
+			<div id="modal"></div>
+			<div data-for="?item" data-items="15" class="paginator"></div>
+			<div data-lift="embed?what=editsupport"></div>
+			<!-- textarea class="col-md-12 query"></textarea -->
+		</div>
+	</div>
+</div>

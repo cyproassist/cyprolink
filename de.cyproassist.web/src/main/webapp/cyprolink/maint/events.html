@@ -1,0 +1,254 @@
+<div data-lift="surround?with=default;at=content"
+	prefix="
+	rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+	foaf: http://xmlns.com/foaf/0.1/ 
+	owl: http://www.w3.org/2002/07/owl#
+	rdfs: http://www.w3.org/2000/01/rdf-schema#
+	dcterms: http://purl.org/dc/terms/
+	lf-maint: http://linkedfactory.org/vocab/maintenance#
+	">
+
+	<link rel="stylesheet" type="text/css" href="../css/app.css"
+		data-lift="head"></link>
+
+	<style type="text/css" data-lift="head">
+#items>section:nth-child(2n+1) {
+	background-color: #F9F9F9;
+}
+
+#items {
+	margin-bottom: 1em;
+}
+
+.content {
+	padding: 5px;
+}
+
+.content.actions {
+	text-align: right;
+}
+
+.search-form {
+	margin: 0;
+	margin-right: 25px;
+}
+
+.label {
+	color: white;
+}
+
+h3 [lang]::before {
+	content: '';
+}
+
+h3 [lang]::after {
+	content: ''
+}
+</style>
+	<script data-lift="head">
+		$(function() {
+			// initialize language input from query parameters
+			var $language = $('.language');
+
+			// set current language from query parameters
+			var params = enilink.params();
+			if (params.lang) {
+				$language.val(params.lang);
+			}
+
+			// hthe current language
+			var lang = $language.val();
+
+			// reload page if language is changed
+			$language.change(function() {
+				params.lang = $(this).val();
+				window.location.search = enilink.encodeParams(params);
+			});
+
+			// show dialog for the creation of a new element
+			$("#btn-add-item").click(function(e) {
+				enilink.render("cyprolink/maint/new-event", {
+					model : enilink.contextModel(this),
+					machine : enilink.param("machine")
+				}, function(html) {
+					var div = $("#modal");
+					div.html(html);
+					div.find(".modal").modal("show");
+				});
+			});
+
+			// append newly created element to the page
+			$(document).on("event-created", function(evt, uri) {
+				var items = $("#items");
+				enilink.render({
+					template : "item",
+					bind : {
+						item : uri,
+						currentLang : enilink.param("lang") || "de"
+					}
+				}, {
+					model : enilink.contextModel(items)
+				}, function(html) {
+					var newItem = $(html);
+
+					newItem.each(prepareItem);
+					enilink.ui.enableAdd(newItem.find('[data-add]'));
+					items.append(newItem);
+				});
+				$("#modal .modal").modal("hide");
+			});
+
+			function prepareItem() {
+				// set correct language for new elements
+				$(this).find('[data-add="text"]').attr('data-lang', lang);
+
+				var types = $(this).find('[rel="rdf:type"] [resource]').map(function() {
+					return $(this).attr('resource');
+				}).get().join(' ').toLowerCase();
+
+				var labelType = 'info';
+				if (types.indexOf('fault') >= 0) {
+					labelType = 'danger';
+				} else if (types.indexOf('warning') >= 0) {
+					labelType = 'warning';
+				}
+
+				$(this).find('.label').addClass('label-' + labelType);
+			}
+
+			// Add label classes for each event type			
+			$('.item').each(prepareItem);
+		});
+	</script>
+
+	<script data-lift="JS.templates"></script>
+	<script data-lift="JS.rdfa"></script>
+
+	<h3 style="display: inline-block" data-lift="rdfa"
+		data-params="?machine">
+		Meldungen für <span data-unless-param="machine">alle Maschinen</span><span
+			data-if-param="machine" about="?machine"> <span
+			property="rdfs:label" content="?machineLabel"
+			data-filter="lang(?machineLabel) = ?currentLang"
+			data-lift="rdf.label"></span>
+		</span>
+	</h3>
+
+	<div data-lift="cyprolink/rdfaUtils.orderby">
+		<div data-lift="rdfa" data-params="?machine">
+			<div style="text-align: right; display: flex" class="pull-right">
+				<div class="search-form"></div>
+
+				<div>
+					<select class="form-control language">
+						<option value="de">Deutsch</option>
+						<option value="en">Englisch</option>
+					</select>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+
+			<section class="row header-top">
+				<div class="col-md-2">
+					<h4 data-orderby="item">Name</h4>
+				</div>
+				<div class="col-md-2">
+					<h4 data-orderby="nr!asc">Nummer</h4>
+				</div>
+				<div class="col-md-6">
+					<h4>Text</h4>
+				</div>
+				<div class="col-md-2">
+					<h4></h4>
+				</div>
+			</section>
+
+			<div id="items">
+				<section data-t="item" about="?item" class="item">
+					<div data-if-param="machine" rel="lf-maint:occursInMachine"
+						resource="?machine"></div>
+
+					<div rel="rdf:type">
+						<div class="union clearable">
+							<div resource="lf-maint:Event"></div>
+							<div resource="lf-maint:Fault"></div>
+							<div resource="lf-maint:Warning"></div>
+							<div resource="lf-maint:Information"></div>
+						</div>
+						<div resource="?type"></div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-2">
+							<div class="content">
+								<h4 class="header-fluid" data-orderby="item">Name</h4>
+
+								<div>
+									<a href="{app}/maint/event?model={model}&resource={}"
+										data-lift="rdf.ref?to=href"><span class="label"> <span
+											data-lift="rdf.name"></span></span></a>
+									<!--  markers -->
+									<span style="font-size: smaller"> <!-- details marker -->
+										<span rel="lf-maint:detail" resource="?" class="optional"><i
+											class="glyphicon glyphicon-file"></i></span> <!-- actions marker -->
+										<span rel="lf-maint:action" resource="?" class="optional"><i
+											class="glyphicon glyphicon-wrench"></i></span>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2 optional">
+							<div class="content">
+								<h4 class="header-fluid" data-orderby="nr">Nummer</h4>
+								<div property="lf-maint:nr" content="?nr" data-lift="rdf.label"></div>
+							</div>
+						</div>
+
+						<div property="lf-maint:description" content="?searchText"
+							class="clearable optional"></div>
+
+						<div class="col-md-6 optional">
+							<div class="content" data-filter="lang(?text) = ?currentLang">
+								<h4 class="header-fluid">Text</h4>
+
+								<div property="lf-maint:description" content="?text"
+									class="editable" data-t="text" style="display: inline-box">
+									<span data-lift="rdf.label"></span>
+								</div>
+
+								<!-- a simple add button -->
+								<div data-property="lf-maint:description" data-add="text">
+									<i class="glyphicon glyphicon-plus"></i>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div class="content actions">
+								<a class="btn-delete-item btn-hover" href="javascript://"
+									data-lift="cyprolink/events.delete"><i
+									class="glyphicon glyphicon-trash"></i></a> <a class="btn-hover"
+									href="{app}/describe?model={model}&resource={}"
+									data-lift="rdf.ref?to=href"><i
+									class="glyphicon glyphicon-edit"></i></a>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+
+			<section>
+				<a id="btn-add-item" class="btn btn-default btn-small"
+					href="javascript:void(0)"><i class="glyphicon glyphicon-plus"></i>
+					Create</a>
+			</section>
+			<div id="modal"></div>
+			<div data-for="?item" data-items="10" class="paginator"></div>
+			<div data-lift="embed?what=editsupport"></div>
+
+			<!-- textarea class="col-md-12 query"></textarea -->
+
+			<div class="search-patterns" data-for="?item ?searchText"
+				data-param="q"></div>
+		</div>
+	</div>
+</div>

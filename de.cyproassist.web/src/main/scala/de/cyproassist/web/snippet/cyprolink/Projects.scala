@@ -24,6 +24,106 @@ import net.enilink.komma.model.IModel
 import net.enilink.komma.core.Statement
 import de.cyproassist.web.util.DCTERMS
 import net.enilink.vocab.foaf.FOAF
+import net.enilink.komma.core.URI
+import net.enilink.komma.em.concepts.IResource
+import net.enilink.komma.model.IObject
+import scala.collection.mutable.Queue
+import scala.collection.mutable.HashSet
+import net.enilink.komma.model.base.ExtensibleURIConverter
+import java.io.BufferedInputStream
+import net.enilink.komma.model.IURIConverter
+import net.enilink.komma.core.visitor.IDataVisitor
+import net.enilink.komma.core.IStatement
+import net.enilink.vocab.owl.OWL
+import net.enilink.komma.core.IReference
+import net.enilink.komma.model.ModelUtil
+import net.enilink.komma.model.IModelSet
+import net.enilink.komma.core.URIs
+import scala.collection.JavaConversions._
+import java.util.HashMap
+import net.enilink.komma.core.ILiteral
+import java.util.Date
+import javax.xml.datatype.XMLGregorianCalendar
+
+object ProjectHelpers {
+  val PROJECTS_MODEL_URI = URIs.createURI("http://cyproassist.de/models/projects")
+
+  def create(model: IModel, uri: URI, name: String): IObject = {
+    val projectType = FOAF.TYPE_PROJECT
+    val project = model.resolve(uri)
+    project.addProperty(RDF.PROPERTY_TYPE, projectType)
+    project.setRdfsLabel(name)
+    project.set(DCTERMS.PROPERTY_DATE, DatatypeFactory.newInstance.newXMLGregorianCalendar(new GregorianCalendar))
+    project
+  }
+
+  def loadFromFileSystem(projectsFile: URI) {
+    def createModel(modelSet: IModelSet, uri: URI)(initFunc: IModel => Unit): IModel = {
+      var model = modelSet.getModel(uri, false)
+      if (model == null) {
+        model = modelSet.createModel(uri)
+        initFunc(model)
+        // trigger reloading of model
+        model.getManager
+      }
+      model
+    }
+
+    Globals.contextModelSet.vend map { ms =>
+      try {
+        ms.getUnitOfWork.begin
+        createModel(ms, PROJECTS_MODEL_URI) { projectsModel =>
+          projectsModel.load(projectsFile, new HashMap)
+
+          val uriConverter = new ExtensibleURIConverter
+
+          val projects = projectsModel.getManager.matchAsserted(null, RDF.PROPERTY_TYPE, FOAF.TYPE_PROJECT).toList
+          projects.map(_.getSubject).foreach { pRef =>
+            projectsModel.getManager.matchAsserted(pRef, PROJECTS_MODEL_URI.appendLocalPart("file"), null).toList.map(_.getObject.asInstanceOf[ILiteral].getLabel).foreach { filePath =>
+              val fileUri = URIs.createURI(filePath).resolve(projectsFile)
+
+              val cal = new GregorianCalendar()
+              val ts = uriConverter.getAttributes(fileUri, null).get(IURIConverter.ATTRIBUTE_TIME_STAMP).asInstanceOf[Number]
+              cal.setTime(new Date(ts.longValue))
+              val project = projectsModel.resolve(pRef)
+              val newDate = DatatypeFactory.newInstance.newXMLGregorianCalendar(cal)
+
+              // update model if file has changed
+              project.get(DCTERMS.PROPERTY_DATE) match {
+                case oldDate: XMLGregorianCalendar => {
+                  if (newDate.compare(oldDate) > 0) {
+                    // delete model to trigger reloading
+                    Option(ms.getModel(pRef.getURI, false)) foreach { model =>
+                      val changeSupport = ms.getDataChangeSupport
+                      try {
+                        changeSupport.setEnabled(null, false)
+                        model.getManager.clear
+                      } finally {
+                        changeSupport.setEnabled(null, true)
+                      }
+                      model.unload
+                      ms.getModels.remove(model)
+                      ms.getMetaDataManager.remove(model)
+                    }
+                  }
+                }
+                case _ => // do nothing
+              }
+              project.set(DCTERMS.PROPERTY_DATE, newDate)
+
+              createModel(ms, pRef.getURI) { model =>
+                model.load(fileUri, new HashMap)
+                model.addImport(URIs.createURI("http://linkedfactory.org/vocab/maintenance"), "lf-maint")
+              }
+            }
+          }
+        }
+      } finally {
+        ms.getUnitOfWork.end
+      }
+    }
+  }
+}
 
 class Projects {
   /**
@@ -43,18 +143,17 @@ class Projects {
       model <- Globals.contextModel.vend
       name <- doAlert(paramNotEmpty("name", "Bitte einen Namen eingeben."))
     } yield {
-      val project = model.resolve(projectUri(model, name))
+      val uri = projectUri(model, name)
+      var project = model.resolve(uri)
       val projectType = FOAF.TYPE_PROJECT
       (if (project.getRdfTypes.contains(projectType)) {
         S.error("alert-name", "Ein Projekt mit diesem Namen existiert bereits.")
         Empty
       } else {
-        project.addProperty(RDF.PROPERTY_TYPE, projectType)
-        project.setRdfsLabel(name)
+        project = ProjectHelpers.create(model, uri, name)
         S.param("description").filter(!_.isEmpty) foreach {
           desc => project.setRdfsComment(desc)
         }
-        project.set(DCTERMS.PROPERTY_DATE, DatatypeFactory.newInstance.newXMLGregorianCalendar(new GregorianCalendar))
 
         val projectModel = project.getModel.getModelSet.createModel(project.getURI)
         projectModel.setLoaded(true)
