@@ -1,4 +1,11 @@
 jdk:
 - oraclejdk8
-
 script: mvn package
+deploy:
+  provider: releases
+  api_key:
+    secure: V5/U9K0MCFbjT5iVEo3ddso7rOiZIHNEpl3gtPhV1Pa0a3kslKBvzRxBFGLXP2jr5ZjjRpPWZbjm9/CfwQrWUao2iooAPgeQkkMwEyGysaD2TPA7q8j7MTg8lKH+m6D9zZtn57Av1/nhq3dIlzUe02hatnUs4ZtBKODSDXi2x1DgssNzMPRBA+1K1QcbVqJBGElLxnI4MCg1cmRTvc3FzTfnJ42JOExuukDbopWkt/IhWR6ZHwzEdQTEV+jIoOaKNzBOqjZXfLxzJvUXHNLjKGc8VTijki7r9jZnuoQj95f6WMDSeZi23vbFVxtKNtWdQcG2wjin7xbNYGxnSaoC0fUMWytW/4alt2YWD5/z/oVlHUXTq58wutWj5Iz/p7Zd6z0myZiuhZ/rMvb6V9sGn6xEXEz3YKml5aSS8vIvkwO6/SkF6bFkMLQqzROj1ozzed5uSUylFNV6TTuYbU4C6+xIAuCcE++zoNFQfRQtkE/tW8Z4ytSYuTS7GkE1OH842PYSL5onsl7KFJBSgn+YSQRivHYmoC2ERK720LI5Ud5+1+tXZtTG0i7uTzDEzGcc+2JSMnkMUatoHdaOgdc9BNSUiCyJcTrRtSmaF2ECpTLqZ0oYTz7PkOMvzlH13+FHC6lUBOsZHhtuvL/z8xaFm8m/Re+SQ/wH7eJISXt7EuQ=
+  file_glob: true
+  file: de.cyproassist.web/target/de.cyproassist.web-*{.jar}
+  on:
+    repo: cyproassist/cyprolink
