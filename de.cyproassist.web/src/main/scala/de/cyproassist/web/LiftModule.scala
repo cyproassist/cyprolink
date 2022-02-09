@@ -1,48 +1,29 @@
 package de.cyproassist.web
 
-import java.io.File
-import java.io.FileInputStream
-import java.net.URL
-import java.security.PrivilegedAction
-import java.util.HashMap
-
-import scala.collection.JavaConversions.collectionAsScalaIterable
-import scala.language.implicitConversions
-
+import de.cyproassist.web.snippet.cyprolink.ProjectHelpers
+import de.cyproassist.web.vui.VuiFeedback
+import net.enilink.komma.core.URIs
+import net.enilink.platform.core.security.SecurityUtil
+import net.enilink.platform.lift.sitemap.Menus.{appMenu, application}
+import net.enilink.platform.lift.sitemap.{HideIfInactive, Menus}
+import net.enilink.platform.lift.snippet.QueryParams
+import net.enilink.platform.lift.util.Globals
+import net.liftweb.common.{Box, Full}
+import net.liftweb.http.LiftRulesMocker.toLiftRules
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.http.{GetRequest, LiftRules, LiftSession, RedirectResponse, Req, S, StreamingResponse}
+import net.liftweb.sitemap.Loc.{EarlyResponse, Hidden, If, QueryParameters, strToFailMsg}
+import net.liftweb.sitemap.SiteMap
+import net.liftweb.util.Helpers.tryo
 import org.eclipse.osgi.service.datalocation.Location
 import org.osgi.framework.FrameworkUtil
 
-import de.cyproassist.web.snippet.cyprolink.ProjectHelpers
-import de.cyproassist.web.vui.VuiFeedback
+import java.io.{File, FileInputStream}
+import java.net.URL
+import java.security.PrivilegedAction
 import javax.security.auth.Subject
-import net.enilink.core.security.SecurityUtil
-import net.enilink.komma.core.URI
-import net.enilink.komma.core.URIs
-import net.enilink.komma.model.IModel
-import net.enilink.lift.sitemap.HideIfInactive
-import net.enilink.lift.sitemap.Menus
-import net.enilink.lift.sitemap.Menus.appMenu
-import net.enilink.lift.sitemap.Menus.application
-import net.enilink.lift.snippet.QueryParams
-import net.enilink.lift.util.Globals
-import net.liftweb.common.Box
-import net.liftweb.common.Full
-import net.liftweb.http.GetRequest
-import net.liftweb.http.LiftRules
-import net.liftweb.http.LiftRulesMocker.toLiftRules
-import net.liftweb.http.LiftSession
-import net.liftweb.http.RedirectResponse
-import net.liftweb.http.Req
-import net.liftweb.http.S
-import net.liftweb.http.StreamingResponse
-import net.liftweb.http.rest.RestHelper
-import net.liftweb.sitemap.Loc.EarlyResponse
-import net.liftweb.sitemap.Loc.Hidden
-import net.liftweb.sitemap.Loc.If
-import net.liftweb.sitemap.Loc.strToFailMsg
-import net.liftweb.sitemap.SiteMap
-import net.liftweb.util.Helpers.tryo
-import net.liftweb.sitemap.Loc.QueryParameters
+import scala.jdk.CollectionConverters._
+import scala.language.implicitConversions
 
 /**
  * This is the main class of the web module. It sets up and tears down the application.
@@ -55,9 +36,11 @@ class LiftModule {
       val params = S.param("model").map(m => s"?model=$m").openOr("")
       Full(RedirectResponse(s"/$app/maint/machines$params"))
     })
+
     def modelParams(includeResource: Boolean) = QueryParameters(() => {
       S.param("model").map(m => ("model", m)).toList ++ (if (includeResource) S.param("resource").map(m => ("resource", m)).toList else Nil)
     })
+
     val menu = application(app, app :: Nil, List(
       appMenu("maint.redirect1", S ? "", List("maint")) >> Hidden >> redirectTo,
       appMenu("maint.redirect2", S ? "", List("maint", "index")) >> Hidden >> redirectTo,
@@ -73,7 +56,8 @@ class LiftModule {
   def boot {
     // determine the instance location (workspace)
     val ctx = FrameworkUtil.getBundle(getClass).getBundleContext
-    val locService = ctx.getServiceReferences(classOf[Location], Location.INSTANCE_FILTER).headOption.map(ctx.getService(_))
+    val locService = ctx.getServiceReferences(classOf[Location], Location.INSTANCE_FILTER)
+      .asScala.headOption.map(ctx.getService(_))
 
     Subject.doAs(SecurityUtil.SYSTEM_USER_SUBJECT, new PrivilegedAction[Any]() {
       def run = {

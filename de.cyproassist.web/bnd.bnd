@@ -1,0 +1,3 @@
+Lift-Module: de.cyproassist.web.LiftModule
+Lift-Packages: de.cyproassist.web
+Bundle-SymbolicName: ${project.artifactId};singleton:=true

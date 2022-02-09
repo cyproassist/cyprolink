@@ -1,26 +1,19 @@
 package de.cyproassist.web.snippet.cyprolink
 
-import java.util.GregorianCalendar
+import de.cyproassist.web.util.{DCTERMS, LF_MAINT}
 import de.cyproassist.web.util.SnippetHelpers._
-import javax.xml.datatype.DatatypeFactory
+import net.enilink.komma.core.URIs
 import net.enilink.komma.em.concepts.IResource
-import net.enilink.lift.util.CurrentContext
-import net.enilink.lift.util.Globals
-import net.liftweb.common.Empty
-import net.liftweb.common.Full
-import net.liftweb.http.S
-import net.liftweb.http.SHtml
+import net.enilink.platform.lift.util.{CurrentContext, Globals}
+import net.liftweb.common.{Empty, Full}
+import net.liftweb.http.{S, SHtml}
 import net.liftweb.http.js.JsCmds
 import net.liftweb.http.js.JsCmds.Run
-import net.liftweb.util.Helpers.strToCssBindPromoter
-import net.liftweb.util.Helpers.tryo
-import net.enilink.komma.core.URIs
-import de.cyproassist.web.util.DCTERMS
-import de.cyproassist.web.util.LF_MAINT
-import scala.xml.NodeSeq
-import scala.xml.Elem
-import scala.xml.UnprefixedAttribute
 import net.liftweb.util.Helpers._
+
+import java.util.GregorianCalendar
+import javax.xml.datatype.DatatypeFactory
+import scala.xml.{Elem, NodeSeq}
 
 class Events {
   def create = SHtml.hidden(() => {

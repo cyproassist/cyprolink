@@ -6,10 +6,9 @@ import net.liftweb.common.Full
 import net.liftweb.http.CometListener
 import net.liftweb.http.js.JE.JsRaw
 import net.liftweb.http.js.JsCmds.jsExpToJsCmd
-import net.liftweb.json.JsonAST.{ render => renderJson }
+import net.liftweb.json.JsonAST.{ render => renderJson, compactRender }
 import net.liftweb.json.JsonDSL.pair2jvalue
 import net.liftweb.json.JsonDSL.string2jvalue
-import net.liftweb.json.Printer.compact
 import net.liftweb.util.Helpers.intToTimeSpanBuilder
 
 class VuiFeedbackComet extends CometListener with ActorHelper {
@@ -41,7 +40,7 @@ class VuiFeedbackComet extends CometListener with ActorHelper {
     case VuiSubjectChanged(item) => {
       val data = ("item", item)
       //trigger device-registered to all listeners
-      partialUpdate(triggerCmd("vui-subject-changed", compact(renderJson(data))))
+      partialUpdate(triggerCmd("vui-subject-changed", compactRender(data)))
     }
   }
 }

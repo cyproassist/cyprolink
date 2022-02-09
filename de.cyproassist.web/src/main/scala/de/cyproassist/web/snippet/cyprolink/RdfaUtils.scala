@@ -1,18 +1,12 @@
 package de.cyproassist.web.snippet.cyprolink
 
-import scala.xml.Elem
-import scala.xml.NodeSeq
-import scala.xml.NodeSeq.seqToNodeSeq
-import net.enilink.lift.snippet.ParamsHelper
-import net.liftweb.common.Full
+import net.enilink.platform.lift.snippet.ParamsHelper
+import net.liftweb.common.{Box, Empty, Full}
 import net.liftweb.http.S
 import net.liftweb.util.Helpers.appendParams
-import net.liftweb.util.Helpers.strToSuperArrowAssoc
-import net.liftweb.common.Box
-import net.liftweb.common.Empty
-import net.enilink.lift.snippet.QueryParams
-import scala.collection.immutable.Map
-import net.liftweb.http.PageName
+
+import scala.xml.{Elem, NodeSeq}
+import scala.xml.NodeSeq.seqToNodeSeq
 
 class RdfaUtils {
   /**

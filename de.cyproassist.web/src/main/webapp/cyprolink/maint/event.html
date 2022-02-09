@@ -83,69 +83,68 @@
 	<script data-lift="JS.rdfa"></script>
 
 	<div data-lift="cyprolink/Events.listProperties">
-		<div about="?this" data-lift="rdfa" data-bind="?this as ?this">
-			<div>
-				<h3 style="display: inline-block" class="editable optional keep"
-					property="lf-maint:description" content="?text"
-					data-lift="rdf.label" data-filter="lang(?text) = ?currentLang"></h3>
-
-				<div style="text-align: right; display: flex" class="pull-right">
-					<select class="form-control language">
-						<option value="de">Deutsch</option>
-						<option value="en">Englisch</option>
-					</select>
-				</div>
-			</div>
-
-			<div class="properties"
-				data-properties="lf-maint:correctedBy lf-maint:occursInMachine lf-maint:occursInLocation">
+		<div data-lift="rdfa" data-bind="?this as ?this">
+			<div about="?this">
 				<div>
-					<span data-lift="rdf.!label" class="property"></span> <span
-						resource="?pValue" class="property-value"><a
-						href="../describe?resource={}&model={model}"
-						data-lift="rdf.ref?to=href"> <span about="?pValue"
-							data-lift="rdf.label"></span></a></span>
+					<h3 style="display: inline-block" class="editable optional keep"
+						property="lf-maint:description" content="?text"
+						data-lift="rdf.label" data-filter="lang(?text) = ?currentLang"></h3>
+
+					<div style="text-align: right; display: flex" class="pull-right">
+						<select class="form-control language">
+							<option value="de">Deutsch</option>
+							<option value="en">Englisch</option>
+						</select>
+					</div>
 				</div>
-			</div>
 
-			<!-- textarea class="query"></textarea -->
+				<div class="properties"
+					data-properties="lf-maint:correctedBy lf-maint:occursInMachine lf-maint:occursInLocation">
+					<div>
+						<span data-lift="rdf.!label" class="property"></span> <span
+							resource="?pValue" class="property-value"><a
+							href="../describe?resource={}&model={model}"
+							data-lift="rdf.ref?to=href"> <span about="?pValue"
+								data-lift="rdf.label"></span></a></span>
+					</div>
+				</div>
 
-			<div class="row optional">
-				<div class="col-md-12">
-					<h3>Details</h3>
+				<div class="row optional">
+					<div class="col-md-12">
+						<h3>Details</h3>
 
-					<div rel="lf-maint:detail" resource="?firstDetail">
-						<div data-pattern="?firstDetail lf-maint:next* ?detail"
-							data-next-rel="lf-maint:next">
-							<!-- invisible element is required to update pointer to the head element of the linked list -->
-							<li about="?this" style="display: none"
-								data-next-rel="lf-maint:detail"><span rel="lf-maint:detail"
-								resource="?firstDetail" class="next"></span></li>
+						<div rel="lf-maint:detail" resource="?firstDetail">
+							<div data-pattern="?firstDetail lf-maint:next* ?detail"
+								data-next-rel="lf-maint:next">
+								<!-- invisible element is required to update pointer to the head element of the linked list -->
+								<li about="?this" style="display: none"
+									data-next-rel="lf-maint:detail"><span
+									rel="lf-maint:detail" resource="?firstDetail" class="next"></span></li>
 
-							<div about="?detail" class="union col-md-4">
-								<!-- a detail image with optional components -->
-								<div data-if="?file" class="image">
-									<div rel="rdf:type" class="clearable">
-										<span resource="lf-maint:Image"></span>
+								<div about="?detail" class="union col-md-4">
+									<!-- a detail image with optional components -->
+									<div data-if="?file" class="image">
+										<div rel="rdf:type" class="clearable">
+											<span resource="lf-maint:Image"></span>
+										</div>
+
+										<img src="../images/{}" about="?detail"
+											property="lf-maint:file" content="?file" class="optional"
+											data-lift="rdf.label?to=src"></img>
+
+										<!-- components within the image -->
+										<div class="optional">
+											<div data-embed="cyprolink/maint/_component"></div>
+										</div>
 									</div>
 
-									<img src="../images/{}" about="?detail"
-										property="lf-maint:file" content="?file" class="optional"
-										data-lift="rdf.label?to=src"></img>
-
-									<!-- components within the image -->
-									<div class="optional">
-										<div data-embed="cyprolink/maint/_component"></div>
+									<!-- a list of maintenance instructions -->
+									<div data-if="?instructionType">
+										<div rel="rdf:type" resource="?instructionType" class="clearable">
+											<span data-pattern="?instructionType <x:y>? lf-maint:Instruction"></span>
+										</div>
+										<div data-embed="cyprolink/maint/_instruction"></div>
 									</div>
-								</div>
-
-								<!-- a list of maintenance instructions -->
-								<div data-if="?instructionType">
-									<div rel="rdf:type" class="clearable">
-										<span resource="?instructionType"
-											data-pattern="?instructionType <x:y>? lf-maint:Instruction"></span>
-									</div>
-									<div data-embed="cyprolink/maint/_instruction"></div>
 								</div>
 							</div>
 						</div>

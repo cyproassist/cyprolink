@@ -1,49 +1,24 @@
 package de.cyproassist.web.snippet.cyprolink
 
-import scala.collection.immutable.Nil
-import de.cyproassist.web.util.SnippetHelpers._
-import net.enilink.komma.core.IEntity
-import net.enilink.lift.util.AjaxHelpers
-import net.enilink.lift.util.CurrentContext
-import net.enilink.lift.util.Globals
-import net.liftweb.common.Empty
-import net.liftweb.common.Full
-import net.liftweb.http.S
-import net.liftweb.http.SHtml
-import net.liftweb.http.js.JsCmd
-import net.liftweb.http.js.JsCmd.unitToJsCmd
-import net.liftweb.http.js.JsCmds.Noop
-import net.liftweb.http.js.JsCmds.Run
-import net.liftweb.util.ClearNodes
-import net.liftweb.util.Helpers.strToCssBindPromoter
-import net.enilink.vocab.rdfs.Class
-import net.enilink.vocab.rdf.RDF
-import javax.xml.datatype.DatatypeFactory
-import java.util.GregorianCalendar
-import net.enilink.komma.model.IModel
-import net.enilink.komma.core.Statement
 import de.cyproassist.web.util.DCTERMS
-import net.enilink.vocab.foaf.FOAF
-import net.enilink.komma.core.URI
-import net.enilink.komma.em.concepts.IResource
-import net.enilink.komma.model.IObject
-import scala.collection.mutable.Queue
-import scala.collection.mutable.HashSet
+import de.cyproassist.web.util.SnippetHelpers._
+import net.enilink.komma.core._
+import net.enilink.komma.model.{IModel, IModelSet, IObject, IURIConverter}
 import net.enilink.komma.model.base.ExtensibleURIConverter
-import java.io.BufferedInputStream
-import net.enilink.komma.model.IURIConverter
-import net.enilink.komma.core.visitor.IDataVisitor
-import net.enilink.komma.core.IStatement
-import net.enilink.vocab.owl.OWL
-import net.enilink.komma.core.IReference
-import net.enilink.komma.model.ModelUtil
-import net.enilink.komma.model.IModelSet
-import net.enilink.komma.core.URIs
-import scala.collection.JavaConversions._
-import java.util.HashMap
-import net.enilink.komma.core.ILiteral
-import java.util.Date
-import javax.xml.datatype.XMLGregorianCalendar
+import net.enilink.platform.lift.util.{AjaxHelpers, CurrentContext, Globals}
+import net.enilink.vocab.foaf.FOAF
+import net.enilink.vocab.rdf.RDF
+import net.liftweb.common.{Empty, Full}
+import net.liftweb.http.{S, SHtml}
+import net.liftweb.http.js.JsCmd
+import net.liftweb.http.js.JsCmds.{Noop, Run}
+import net.liftweb.util.ClearNodes
+import net.liftweb.util.Helpers._
+
+import java.util.{Date, GregorianCalendar, HashMap}
+import javax.xml.datatype.{DatatypeFactory, XMLGregorianCalendar}
+import scala.collection.immutable.Nil
+import scala.jdk.CollectionConverters._
 
 object ProjectHelpers {
   val PROJECTS_MODEL_URI = URIs.createURI("http://cyproassist.de/models/projects")
@@ -78,8 +53,9 @@ object ProjectHelpers {
           val uriConverter = new ExtensibleURIConverter
 
           val projects = projectsModel.getManager.matchAsserted(null, RDF.PROPERTY_TYPE, FOAF.TYPE_PROJECT).toList
-          projects.map(_.getSubject).foreach { pRef =>
-            projectsModel.getManager.matchAsserted(pRef, PROJECTS_MODEL_URI.appendLocalPart("file"), null).toList.map(_.getObject.asInstanceOf[ILiteral].getLabel).foreach { filePath =>
+          projects.asScala.map(_.getSubject).foreach { pRef =>
+            projectsModel.getManager.matchAsserted(pRef, PROJECTS_MODEL_URI.appendLocalPart("file"), null)
+              .toList.asScala.map(_.getObject.asInstanceOf[ILiteral].getLabel).foreach { filePath =>
               val fileUri = URIs.createURI(filePath).resolve(projectsFile)
 
               val cal = new GregorianCalendar()

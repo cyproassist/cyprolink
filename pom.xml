@@ -8,67 +8,54 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
-		<tycho-version>1.1.0</tycho-version>
-		<scala.version>2.11.1</scala.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<enilink.version>1.4.0-SNAPSHOT</enilink.version>
+		<scala.version>2.13.2</scala.version>
+
+		<bnd.version>6.1.0</bnd.version>
 	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>4.4.0</version>
 				<configuration>
 					<scalaVersion>${scala.version}</scalaVersion>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<phase>process-classes</phase>
 						<goals>
-							<goal>compile</goal>
-							<goal>testCompile</goal>
+							<goal>bnd-process</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<excludeResources>
-						<excludeResource>**/*.scala</excludeResource>
-					</excludeResources>
-				</configuration>
 			</plugin>
 		</plugins>
 
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>target-platform-configuration</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<target>
-							<artifact>
-								<groupId>de.cyproassist</groupId>
-								<artifactId>target-platform</artifactId>
-								<version>1.0.0</version>
-							</artifact>
-						</target>
-						<executionEnvironment>JavaSE-1.8</executionEnvironment>  
-					</configuration>
+					<groupId>biz.aQute.bnd</groupId>
+					<artifactId>bnd-maven-plugin</artifactId>
+					<version>${bnd.version}</version>
 				</plugin>
 
 				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-packaging-plugin</artifactId>
-					<version>${tycho-version}</version>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+					<configuration>
+						<release>11</release>
+					</configuration>
 				</plugin>
 
 				<!-- Plugins for copying of Webjars and Java dependencies into the projects. -->
@@ -84,7 +71,10 @@
 								<goal>unpack-dependencies</goal>
 							</goals>
 							<configuration>
-								<outputDirectory>.</outputDirectory>
+								<includeGroupIds>org.webjars, org.webjars.bower,
+									org.webjars.npm
+								</includeGroupIds>
+								<outputDirectory>${project.build.outputDirectory}</outputDirectory>
 								<includeScope>runtime</includeScope>
 								<includes>META-INF/resources/webjars/**</includes>
 								<excludes>**/src/**</excludes>
@@ -98,11 +88,31 @@
 								<goal>copy-dependencies</goal>
 							</goals>
 							<configuration>
-								<excludeGroupIds>org.webjars, org.webjars.bower, org.webjars.npm</excludeGroupIds>
+								<excludeGroupIds>org.webjars, org.webjars.bower,
+									org.webjars.npm
+								</excludeGroupIds>
 								<stripVersion>true</stripVersion>
-								<outputDirectory>lib/</outputDirectory>
+								<outputDirectory>${project.build.outputDirectory}/lib</outputDirectory>
 								<includeScope>runtime</includeScope>
 							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.1</version>
+					<configuration>
+						<archive>
+							<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+						</archive>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>test-jar</goal>
+							</goals>
 						</execution>
 					</executions>
 				</plugin>
@@ -125,7 +135,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute />
+										<execute/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -134,10 +144,53 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>.keep</exclude>
+				</excludes>
+			</resource>
+
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>plugin.xml</include>
+					<include>plugin.properties</include>
+				</includes>
+			</resource>
+
+			<resource>
+				<directory>src/main/webapp</directory>
+				<excludes>
+					<exclude>.keep</exclude>
+				</excludes>
+			</resource>
+		</resources>
 	</build>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.32</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>oss-sonatype-snapshots</id>
+			<name>OSS Sonatype Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
+
 	<modules>
-		<module>target-platform</module>
 		<module>de.cyproassist.web</module>
 	</modules>
 </project>
