@@ -1,0 +1,9 @@
+target/
+.cache-main
+.cache-tests
+.flattened-pom.xml
+.settings/
+.classpath
+.project
+.idea/
+*.iml
